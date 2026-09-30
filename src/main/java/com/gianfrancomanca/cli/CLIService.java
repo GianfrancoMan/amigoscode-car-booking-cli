@@ -4,6 +4,8 @@ import com.gianfrancomanca.model.Car;
 import com.gianfrancomanca.model.CarBooking;
 import com.gianfrancomanca.model.User;
 import com.gianfrancomanca.service.CarBookingService;
+import com.gianfrancomanca.service.CarService;
+import com.gianfrancomanca.service.UserService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -13,6 +15,8 @@ import java.util.Scanner;
 public class CLIService {
     static Scanner scanner = new Scanner(System.in);
     static CarBookingService carBookingService = new CarBookingService();
+    static UserService userService = new UserService();
+    static CarService carService = new CarService();
 
     //main menu
     public static void userInterface() {
@@ -58,14 +62,10 @@ public class CLIService {
 
     //manage the user's choice from the car menu
     public static String manageCarChoice(int choice, Car[] cars) {
-        return switch (choice) {
-            case 1 -> cars[0].getId().toString();
-            case 2 -> cars[1].getId().toString();
-            case 3 -> cars[2].getId().toString();
-            case 4 -> cars[3].getId().toString();
-            case 5 -> cars[4].getId().toString();
-            default -> "";
-        };
+        for (int i=0; i<cars.length; i++) {
+            if(choice == (i+1)) return cars[i].getId().toString();
+        }
+        return "";
     }
 
     //user choice to book a car
@@ -74,13 +74,16 @@ public class CLIService {
         DateTimeFormatter formater = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         LocalDate toDay = LocalDate.now();
 
-        String userName = validateUserName(scanner);
-        if(userName.equalsIgnoreCase("Cancel")) {
+        String userId = validateUserId(scanner);
+        String username = "";
+        User user= userService.getUserById(userId);
+        username = user.getName();
+        if(userId.equalsIgnoreCase("Cancel") || username.equalsIgnoreCase("not found")) {
             System.out.println("Operation Cancelled");
             return false;
         }
 
-        String[] serviceDates = validateServiceDates(scanner, toDay);
+        String[] serviceDates = validateServiceDates(scanner, toDay, username);
         if(serviceDates[0] == null || serviceDates[1] == null) {
             System.out.println("ERROR!! operation cancelled cause the start date is after the end date or the start date is in the past");
             return false;
@@ -94,7 +97,7 @@ public class CLIService {
 
         String carId = validateChosenCar(scanner, availableCars);
         if(!carId.isEmpty()) {
-            User user = createUser(userName);
+            user = userService.getUserById(userId);
             CarBooking booking =
                     carBookingService.bookCar(user.getId().toString(), carId, serviceDates[0], serviceDates[1], toDay.format(formater)).orElse(null);
             if(booking != null) {
@@ -111,10 +114,10 @@ public class CLIService {
     }
 
     //Ask for user name and validate the input
-    private static String validateUserName(Scanner scanner) {
+    private static String validateUserId(Scanner scanner) {
         if(scanner.hasNextLine()) scanner.nextLine();
         System.out.println("\n        Rental Car      ");
-        System.out.println("Type your name: "); //TODO update for seeded usersà
+        System.out.println("Type customer ID: ");
         String userInput = scanner.nextLine();
         while(userInput.isEmpty() || userInput.isBlank() || userInput.length() < 3 ) {
             System.out.println("Error! Name cannot be empty and should be at least of three characters, please type your name or \"Cancel\" to abort booking:");
@@ -124,11 +127,11 @@ public class CLIService {
     }
 
     //Ask for service dates and validate the input
-    private static String[] validateServiceDates(Scanner dateScanner, LocalDate toDay) {
+    private static String[] validateServiceDates(Scanner dateScanner, LocalDate toDay, String username) {
         String[] dates = new String[2];
         String startDate, endDate ;
 
-        System.out.println("\n      Rental Car       ");
+        System.out.println("\n      Rental Car ->        " + username + "");
         System.out.println("The start date of the service... ");
         do {
             startDate = createDate(dateScanner);
@@ -192,18 +195,14 @@ public class CLIService {
         return carId;
     }
 
-    //create a user and add it to the datasource
-    private static User createUser(String name) {
-        return new User(name);
-    }
-
     private static String[] createBookingElements(User user, CarBooking booking, CarBookingService carBookingService, DateTimeFormatter formater) {
-        String[] elementsToPrint = new String[5];
+        String[] elementsToPrint = new String[6];
         elementsToPrint[0] = user.getId().toString();
-        elementsToPrint[1] = carBookingService.getCarById(booking.getCarID().toString()).getName();
-        elementsToPrint[2] = booking.getStartDate().format(formater);
-        elementsToPrint[3] = booking.getEndDate().format(formater);
-        elementsToPrint[4] = booking.getRentalPrice().toString();
+        elementsToPrint[1] = user.getName();
+        elementsToPrint[2] = carService.getCarById(booking.getCarID().toString()).getName();
+        elementsToPrint[3] = booking.getStartDate().format(formater);
+        elementsToPrint[4] = booking.getEndDate().format(formater);
+        elementsToPrint[5] = booking.getRentalPrice().toString();
         return elementsToPrint;
     }
 }

@@ -45,12 +45,13 @@ public class CLI {
         System.out.println("                Rental Car Booking Details:");
         System.out.println("-----------------------------------------------------------");
         System.out.println("\t\tCustomer ID: " + data[0]);
-        System.out.println("\t\tCar model: " + data[1]);
-        System.out.println("\t\tStart date: " + data[2]);
-        System.out.println("\t\tEnd date: " + data[3]);
-        System.out.println("\t\tRental price: " + data[4] + "€") ;
+        System.out.println("\t\tCustomer Name: " + data[1]);
+        System.out.println("\t\tCar model: " + data[2]);
+        System.out.println("\t\tStart date: " + data[3]);
+        System.out.println("\t\tEnd date: " + data[4]);
+        System.out.println("\t\tRental price: " + data[5] + "€") ;
         System.out.println();
-        System.out.println("\t\tThank you for choosing us.");
+        System.out.println("\t\tOperation completed successfully.");
         System.out.println("-----------------------------------------------------------\n");
     }
 }

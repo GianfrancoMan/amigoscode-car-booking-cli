@@ -3,31 +3,25 @@ package com.gianfrancomanca.service;
 import com.gianfrancomanca.dao.CarBookingDao;
 import com.gianfrancomanca.model.Car;
 import com.gianfrancomanca.model.CarBooking;
-import com.gianfrancomanca.model.User;
 import com.gianfrancomanca.model.enums.BookingStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Optional;
 
 public class CarBookingService {
 
     public CarBookingService() {}
     CarBookingDao carBookingDao = new CarBookingDao();
-
-
-    public Car[] getAllCars() {
-        return carBookingDao.getCars();
-    }
+    CarService carService = new CarService();
 
 
     public Optional<CarBooking> bookCar(String userId, String carId, String startDate, String endDate, String toDay) {
         CarBooking booking= null;
-        Car car = carBookingDao.getCarById(carId).orElse(null);
-        if(car == null) return Optional.ofNullable(booking);
+        Car car = carService.getCarById(carId);
+        if(car.getName().equalsIgnoreCase("not found")) return Optional.ofNullable(booking);
         LocalDate localStartDate = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         LocalDate localEndDate = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         LocalDate localToDay = LocalDate.parse(toDay, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
@@ -48,10 +42,15 @@ public class CarBookingService {
     //Get all cars that are not booked during the given dates
     public Car[] getAvailableCars(String[] dates) {
         LocalDate startDate = LocalDate.parse(dates[0], DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        LocalDate endDate = LocalDate.parse(dates[1], DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         CarBooking[] bookings = carBookingDao.getBookings();
         StringBuilder carIdsString = new StringBuilder();
         for(int i=0; i<bookings.length; i++) {
-            if((bookings[i].getStartDate().isEqual(startDate) || bookings[i].getEndDate().isEqual(startDate)) || ((bookings[i].getStartDate().isBefore(startDate) && bookings[i].getEndDate().isAfter(startDate)))) {
+            if((bookings[i].getStartDate().isEqual(startDate) || bookings[i].getEndDate().isEqual(startDate)) ||
+                    ((bookings[i].getStartDate().isBefore(startDate) && bookings[i].getEndDate().isAfter(startDate))) ||
+                        (bookings[i].getStartDate().isEqual(endDate) || bookings[i].getEndDate().isEqual(endDate)) ||
+                            ((bookings[i].getStartDate().isBefore(endDate) && bookings[i].getEndDate().isAfter(endDate)))
+            ) {
                 if(!carIdsString.toString().contains(bookings[i].getCarID()))
                     carIdsString.append(bookings[i].getCarID()).append(",");
             }
@@ -60,7 +59,7 @@ public class CarBookingService {
         if(!carIdsString.isEmpty()) {
             carIdsString = new StringBuilder(carIdsString.substring(0, carIdsString.length() - 1));
             String[] carIds = carIdsString.toString().split(",");
-            Car[] cars = carBookingDao.getCars();
+            Car[] cars = carService.getCars();
             Car[] availableCars = new Car[cars.length - carIds.length];
             int availableIndex = 0;
             for(int i=0; i<cars.length; i++) {
@@ -77,21 +76,6 @@ public class CarBookingService {
             }
                 return availableCars;
         }
-        return carBookingDao.getCars();
-    }
-
-    //add a new user
-    public void addUser(User user) {
-        carBookingDao.addUser(user);
-    }
-
-    //get user based on id
-    public User getUserById(String id) {
-        return carBookingDao.getUserById(id).orElse(null);
-    }
-
-    //get car based on id
-    public Car getCarById(String id) {
-        return carBookingDao.getCarById(id).orElse(null);
+        return carService.getCars();
     }
 }
