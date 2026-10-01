@@ -1,40 +1,40 @@
 package com.gianfrancomanca.dao;
 
-import com.gianfrancomanca.model.Car;
 import com.gianfrancomanca.model.CarBooking;
 
 /*Contains preloaded Users and Cars and methods to retrieve them*/
 public class CarBookingDao {
 
-    public static Car[] cars = new Car[5];
-    private CarBooking[] bookings = new CarBooking[100];
+    static int index = 0;
+
+    private CarBooking[] bookings;
+
+    public CarBookingDao() {
+        bookings = new CarBooking[index];
+    }
+
     //get all bookings
     public CarBooking[] getBookings() {
-        int indexFilled = 0;
-        for (int i = 0; i < bookings.length; i++) {
-            if(bookings[i] == null) {
-                indexFilled = i;
-                break;
-            }
-        }
-        CarBooking[] bookingsAvailable = new CarBooking[indexFilled];
-        for (int i = 0; i < bookingsAvailable.length; i++) {
-            bookingsAvailable[i] = bookings[i];
-        }
-        return bookingsAvailable;
+        return bookings;
     }
 
     //add a new booking
     public void addBooking(CarBooking booking) {
-        for(int i=0; i<bookings.length; i++) {
-            if(null == bookings[i]) {
-                bookings[i] = booking;
-                break;
+        index++;
+        CarBooking[] bookingsHelper = new CarBooking[index];
+        System.out.println("carBookings.length: " + bookingsHelper.length);
+        if(bookingsHelper.length == 1) bookingsHelper[0] = booking;
+        else {
+            for (int i = 0; i < bookings.length; i++) {
+                bookingsHelper[i] = bookings[i];
             }
+            bookingsHelper[index-1] = booking;
         }
-        System.out.println("prenotazione registrate:");
+        bookings = bookingsHelper;
         for (CarBooking bkg : bookings) System.out.println(bkg);
     }
+
+    //TODO: (not here) resolve BOOKED vs ACTIVE and  available cars based on booking dates
 
 
 }
