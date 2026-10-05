@@ -28,7 +28,6 @@ public class CarBookingDao {
     public void addBooking(CarBooking booking) {
         index++;
         CarBooking[] bookingsHelper = new CarBooking[index];
-        System.out.println("carBookings.length: " + bookingsHelper.length);
         if(bookingsHelper.length == 1) bookingsHelper[0] = booking;
         else {
             for (int i = 0; i < bookings.length; i++) {
@@ -37,7 +36,6 @@ public class CarBookingDao {
             bookingsHelper[index-1] = booking;
         }
         bookings = bookingsHelper;
-        for (CarBooking bkg : bookings) System.out.println(bkg);//to delete later
         setStatus();
     }
 

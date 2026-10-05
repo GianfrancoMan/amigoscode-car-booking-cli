@@ -291,7 +291,7 @@ public class CLIService {
         while (choice != max && carId.isEmpty()) {
             CLI.printHeader("\n\n           CARS AVAILABLE FOR THE SELECTED PERIOD   \n------------------------------------------------------------------");
             CLI.carMenu(availableCars);
-            System.out.println("Type your choice...");
+            CLI.printHeader("Type your choice...");
             if(scanner.hasNextInt()) {
                 choice = CLIService.checkChoice(scanner, 1, max);
                 carId = CLIService.manageCarChoice(choice, availableCars);

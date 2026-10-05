@@ -2,7 +2,6 @@ package com.gianfrancomanca.dao;
 
 import com.gianfrancomanca.model.User;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 public class UserDao {
@@ -14,7 +13,6 @@ public class UserDao {
         users[2] = new User("Giuseppe Verdi");
         users[3] = new User("Giorgio Gaber");
         users[4] = new User("Francesco Totti");
-        System.out.println(Arrays.toString(users)); //printing the array of users
     }
 
 

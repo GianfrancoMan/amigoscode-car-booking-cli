@@ -1,7 +1,6 @@
 package com.gianfrancomanca.service;
 
 import com.gianfrancomanca.dao.CarDao;
-import com.gianfrancomanca.dto.CarAvailable;
 import com.gianfrancomanca.model.Car;
 import com.gianfrancomanca.model.CarBooking;
 import com.gianfrancomanca.model.enums.BookingStatus;
@@ -9,7 +8,6 @@ import com.gianfrancomanca.model.enums.Brand;
 
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 public class CarService {
     private CarDao carDao = new CarDao();
