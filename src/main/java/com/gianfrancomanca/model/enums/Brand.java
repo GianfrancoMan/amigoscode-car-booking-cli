@@ -5,7 +5,8 @@ public enum Brand {
     AUDI("Audi"),
     MERCEDES("Mercedes"),
     CUPRA("Cupra"),
-    FERRARI("Ferrrari");
+    FERRARI("Ferrrari"),
+    RENAULT("Renault");
 
     private String name;
 

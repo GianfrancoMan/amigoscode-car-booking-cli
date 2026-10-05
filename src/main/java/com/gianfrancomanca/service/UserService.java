@@ -11,4 +11,8 @@ public class UserService {
         return userDao.getUserById(id).orElse(new User("Not Found"));
     }
 
+    public User[] getAllUsers() {
+        return userDao.getUsers();
+    }
+
 }

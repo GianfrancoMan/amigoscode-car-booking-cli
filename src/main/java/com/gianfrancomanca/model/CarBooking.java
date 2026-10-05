@@ -5,8 +5,10 @@ import com.gianfrancomanca.model.enums.BookingStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.UUID;
 
 public class CarBooking {
+    private UUID id;
     private String userId;
     private String carID;
     private LocalDate bookingDate;
@@ -16,14 +18,15 @@ public class CarBooking {
     private BookingStatus status;
 
     public CarBooking(
-            String userId, String carID, LocalDate bookingDate, LocalDate startDate, LocalDate endDate, BigDecimal rentalPrice, BookingStatus status) {
+            String userId, String carID, LocalDate bookingDate, LocalDate startDate, LocalDate endDate, BigDecimal rentalPrice) {
         this.userId = userId;
         this.carID = carID;
         this.bookingDate = bookingDate;
         this.startDate = startDate;
         this.endDate = endDate;
         this.rentalPrice = rentalPrice;
-        this.status = status;
+        this.status = BookingStatus.BOOKED;
+        id = UUID.randomUUID();
     }
 
     public String getUserId() {
@@ -44,6 +47,10 @@ public class CarBooking {
 
     public BigDecimal getRentalPrice() {
         return rentalPrice;
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public void setRentalPrice(BigDecimal rentalPrice) {
@@ -113,4 +120,5 @@ public class CarBooking {
         return
                 Objects.hash(getUserId(), getCarID(), getBookingDate(), getStartDate(), getEndDate(), getRentalPrice(), getStatus());
     }
+
 }

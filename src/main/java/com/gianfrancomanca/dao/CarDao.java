@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 public class CarDao {
-    public static Car[] cars = new Car[5];
+    public static Car[] cars = new Car[6];
 
     //Cars static initialization
     static {
@@ -16,6 +16,7 @@ public class CarDao {
         cars[2] = new Car(Brand.MERCEDES, "Class C","HB294RT", new BigDecimal("110.00"), false);
         cars[3] = new Car(Brand.CUPRA, "Formentor","GC615VS", new BigDecimal("120.00"), false);
         cars[4] = new Car(Brand.FERRARI, "296 GTB","HD853XZ", new BigDecimal("2200.00"), false);
+        cars[5] = new Car(Brand.RENAULT, "Megane E-Tech Electric", "ZX 482 QL", new BigDecimal("105.00"), true);
     }
 
 

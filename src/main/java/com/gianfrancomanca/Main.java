@@ -1,6 +1,6 @@
 package com.gianfrancomanca;
 
-import com.gianfrancomanca.cli.CLIService;
+import com.gianfrancomanca.view.CLIService;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.

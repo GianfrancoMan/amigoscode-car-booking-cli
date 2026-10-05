@@ -9,11 +9,11 @@ public class UserDao {
     public static User[] users = new User[5];
 
     static  {
-        users[0] = new User("Gianfranco");
-        users[1] = new User("Marco");
-        users[2] = new User("Giuseppe");
-        users[3] = new User("Giorgio");
-        users[4] = new User("Francesco");
+        users[0] = new User("Gianfranco Manca");
+        users[1] = new User("Marco Polo");
+        users[2] = new User("Giuseppe Verdi");
+        users[3] = new User("Giorgio Gaber");
+        users[4] = new User("Francesco Totti");
         System.out.println(Arrays.toString(users)); //printing the array of users
     }
 

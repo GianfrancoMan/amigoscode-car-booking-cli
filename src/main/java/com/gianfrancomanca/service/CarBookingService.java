@@ -6,36 +6,34 @@ import com.gianfrancomanca.model.CarBooking;
 import com.gianfrancomanca.model.enums.BookingStatus;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.Period;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 public class CarBookingService {
 
-    public CarBookingService() {}
-
     CarBookingDao carBookingDao = new CarBookingDao();
     CarService carService = new CarService();
 
+    private CarBookingService() {}
+    public static class SingletonCarBookingService {
+        private static final CarBookingService INSTANCE = new CarBookingService();
 
-    public Optional<CarBooking> bookCar(String userId, String carId, String startDate, String endDate, String toDay) {
+        public static CarBookingService getInstance() {
+            return INSTANCE;
+        }
+    }
+    public Optional<CarBooking> bookingCar(String userId, String carId, String startDate, String endDate, String toDay) {
         CarBooking booking= null;
         Car car = carService.getCarById(carId);
         if(car.getName().equalsIgnoreCase("not found")) return Optional.ofNullable(booking);
         LocalDate localStartDate = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         LocalDate localEndDate = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         LocalDate localToDay = LocalDate.parse(toDay, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        int days = Period.between(localStartDate, localEndDate).getDays() + 1;
+        long days = ChronoUnit.DAYS.between(localStartDate, localEndDate) + 1;
         BigDecimal rentalPrice = car.getRentalPrice().multiply(new BigDecimal(days));
-        booking = new CarBooking(
-                userId,
-                carId,
-                localToDay,
-                localStartDate,
-                localEndDate,
-                rentalPrice,
-                localStartDate.equals(toDay) ? BookingStatus.ACTIVE : BookingStatus.BOOKED);
+        booking = new CarBooking(userId, carId, localToDay, localStartDate, localEndDate, rentalPrice);
         carBookingDao.addBooking(booking);
         return Optional.of(booking);
     }
@@ -52,7 +50,6 @@ public class CarBookingService {
                     carIdsString.append(bookings[i].getCarID()).append(",");
             }
         }
-
         if(!carIdsString.isEmpty()) {
             carIdsString = new StringBuilder(carIdsString.substring(0, carIdsString.length() - 1));
             String[] carIds = carIdsString.toString().split(",");
@@ -76,6 +73,22 @@ public class CarBookingService {
         return carService.getCars();
     }
 
+    //get all bookings
+    public CarBooking[] getAllBookings() {
+        return carBookingDao.getBookings();
+    }
+
+    //get a booking by its id
+    public CarBooking getBookingById(String id) {
+        return carBookingDao.getBookingById(id).orElse(null);
+    }
+
+    //cancel a booking
+    public boolean cancelBooking(String id) {
+        return carBookingDao.cancelBookingById(id);
+    }
+
+    //check if the given dates are unavailable based on the booking requirement
     private boolean isDateUnavailable(LocalDate startDate, LocalDate endDate, CarBooking booking) {
         if(booking.getStatus() == BookingStatus.CANCELLED) {
             return false;
@@ -92,18 +105,15 @@ public class CarBookingService {
         return false;
     }
 
-    //TEST
-    static void main() {
-        //To test if a date between two dates, matches at least one date between other two dates
-        //example: I have to dates 29-09-2026 and 03-10-2026 and other two dates 30-09-2026 and 01-10-2023
-        //what that should return is if at least one date between 29-09-2026 and 02-10-2026 matches at least one date between 30-09-2026 and 01-10-2023
-        int days = Period.between(LocalDate.of(2026, 9, 29), LocalDate.of(2026, 10, 3)).getDays() +1;
-        System.out.println(days);
-        for(int i=0; i<days; i++) {
-            LocalDate dateToCheck = LocalDate.of(2026, 9, 29).plusDays(i);
-            if((LocalDate.of(2026, 9, 25).isEqual(dateToCheck) || LocalDate.of(2026, 9, 28).isEqual(dateToCheck)) ||
-                    (LocalDate.of(2026, 9, 25).isBefore(dateToCheck) && LocalDate.of(2026, 9, 28).isAfter(dateToCheck)))
-                System.out.println(dateToCheck + " matches");
-        }
+    //Asks CarBookingDao for booking by user id
+    public CarBooking[] getBookingsByUser(String userId) {
+        return carBookingDao.getBookingsByUserId(userId).length > 0 ? carBookingDao.getBookingsByUserId(userId) : null;
     }
 }
+
+
+
+
+
+
+
