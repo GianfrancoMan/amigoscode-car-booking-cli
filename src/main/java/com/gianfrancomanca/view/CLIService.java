@@ -267,12 +267,12 @@ public class CLIService {
     //create a date from the user input
     private static String createDate(Scanner scanner) {
         String date = "";
-        CLI.printHeader("type  the day of the month: ");
-        String day = scanner.nextLine() ;
-        CLI.printHeader("type  the month of the year: ");
-        String month = scanner.nextLine() ;
-        CLI.printHeader("type  the year:");
-        String year = scanner.nextLine() ;
+        CLI.printSentence("type  the day of the month: ");
+        String day = scanner.next() ;
+        CLI.printSentence("\t\tthe month of the year: ");
+        String month = scanner.next() ;
+        CLI.printSentence("\t\tthe year:");
+        String year = scanner.next() ;
         if(month.length() == 1) month = "0" + month;
         if(day.length() == 1) day = "0" + day;
         date += day + "-" + month + "-" + year;

@@ -81,4 +81,8 @@ public class CLI {
     public static void printHeader(String header) {
         System.out.println(header);
     }
+
+    public static void printSentence(String sentence) {
+        System.out.print(sentence);
+    }
 }
