@@ -1,4 +1,4 @@
-package com.gianfrancomanca.model;
+package com.gianfrancomanca.user;
 
 import java.util.Objects;
 import java.util.UUID;

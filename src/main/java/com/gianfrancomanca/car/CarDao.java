@@ -1,7 +1,4 @@
-package com.gianfrancomanca.dao;
-
-import com.gianfrancomanca.model.Car;
-import com.gianfrancomanca.model.enums.Brand;
+package com.gianfrancomanca.car;
 
 import java.math.BigDecimal;
 import java.util.Optional;

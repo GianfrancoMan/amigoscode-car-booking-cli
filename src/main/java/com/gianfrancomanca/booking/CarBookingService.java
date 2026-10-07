@@ -1,9 +1,7 @@
-package com.gianfrancomanca.service;
+package com.gianfrancomanca.booking;
 
-import com.gianfrancomanca.dao.CarBookingDao;
-import com.gianfrancomanca.model.Car;
-import com.gianfrancomanca.model.CarBooking;
-import com.gianfrancomanca.model.enums.BookingStatus;
+import com.gianfrancomanca.car.CarService;
+import com.gianfrancomanca.car.Car;
 
 import java.math.BigDecimal;
 import java.time.*;

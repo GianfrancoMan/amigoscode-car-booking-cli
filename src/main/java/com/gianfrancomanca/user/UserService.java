@@ -1,7 +1,4 @@
-package com.gianfrancomanca.service;
-
-import com.gianfrancomanca.dao.UserDao;
-import com.gianfrancomanca.model.User;
+package com.gianfrancomanca.user;
 
 public class UserService {
 

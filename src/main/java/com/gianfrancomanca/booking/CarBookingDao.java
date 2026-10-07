@@ -1,7 +1,4 @@
-package com.gianfrancomanca.dao;
-
-import com.gianfrancomanca.model.CarBooking;
-import com.gianfrancomanca.model.enums.BookingStatus;
+package com.gianfrancomanca.booking;
 
 import java.time.LocalDate;
 import java.util.Optional;

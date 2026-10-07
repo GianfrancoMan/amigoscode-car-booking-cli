@@ -1,6 +1,4 @@
-package com.gianfrancomanca.model;
-
-import com.gianfrancomanca.model.enums.BookingStatus;
+package com.gianfrancomanca.booking;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

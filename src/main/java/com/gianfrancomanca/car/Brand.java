@@ -1,4 +1,4 @@
-package com.gianfrancomanca.model.enums;
+package com.gianfrancomanca.car;
 
 public enum Brand {
     FORD("Ford"),

@@ -1,6 +1,4 @@
-package com.gianfrancomanca.dao;
-
-import com.gianfrancomanca.model.User;
+package com.gianfrancomanca.user;
 
 import java.util.Optional;
 

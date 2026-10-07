@@ -1,4 +1,4 @@
-package com.gianfrancomanca.model.enums;
+package com.gianfrancomanca.booking;
 
 public enum BookingStatus {
     BOOKED("Booked"),

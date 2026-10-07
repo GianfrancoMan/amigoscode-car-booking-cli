@@ -1,6 +1,4 @@
-package com.gianfrancomanca.model;
-
-import com.gianfrancomanca.model.enums.Brand;
+package com.gianfrancomanca.car;
 
 import java.math.BigDecimal;
 import java.util.Objects;
