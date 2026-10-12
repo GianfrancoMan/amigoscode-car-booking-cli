@@ -3,7 +3,6 @@ package com.gianfrancomanca.booking;
 import java.time.LocalDate;
 import java.util.Optional;
 
-/*Contains preloaded Users and Cars and methods to retrieve them*/
 public class CarBookingDao {
 
     static int index = 0;
@@ -77,21 +76,6 @@ public class CarBookingDao {
             }
         }
         return userBookings;
-    }
-
-    //get all bookings of a specific status
-    public String getCarIdsByStatus(BookingStatus ...inputStatus) {
-        setStatus();
-        String ids = "";
-        for(CarBooking booking : bookings) {
-            for(BookingStatus wantedStatus : inputStatus) {
-                if(booking.getStatus() == wantedStatus)
-                    ids = booking.getCarID() + ",";
-            }
-        }
-        if(ids.length() > 0) ids = ids.substring(0, ids.length()-1);
-
-        return ids;
     }
 
     //set the status of the bookings

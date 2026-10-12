@@ -104,13 +104,7 @@ public class CarBooking {
     public boolean equals(Object o) {
         if (!(o instanceof CarBooking booking)) return false;
         return
-                Objects.equals(getUserId(), booking.getUserId())
-                && Objects.equals(getCarID(), booking.getCarID())
-                && Objects.equals(getBookingDate(), booking.getBookingDate())
-                && Objects.equals(getStartDate(), booking.getStartDate())
-                && Objects.equals(getEndDate(), booking.getEndDate())
-                && Objects.equals(getRentalPrice(), booking.getRentalPrice())
-                && getStatus() == booking.getStatus();
+                Objects.equals(getUserId(), booking.getUserId());
     }
 
     @Override

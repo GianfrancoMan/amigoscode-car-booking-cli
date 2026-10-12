@@ -1,49 +1,40 @@
 package com.gianfrancomanca.booking;
 
-import com.gianfrancomanca.car.CarService;
 import com.gianfrancomanca.car.Car;
+import com.gianfrancomanca.user.User;
 
 import java.math.BigDecimal;
-import java.time.*;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 public class CarBookingService {
 
-    CarBookingDao carBookingDao = new CarBookingDao();
-    CarService carService = new CarService();
+    private final CarBookingDao carBookingDao = new CarBookingDao();
+    private LocalDate toDay;
 
-    private CarBookingService() {}
-    public static class SingletonCarBookingService {
-        private static final CarBookingService INSTANCE = new CarBookingService();
-
-        public static CarBookingService getInstance() {
-            return INSTANCE;
-        }
+    public CarBookingService() {
+        toDay = LocalDate.now();
     }
-    public Optional<CarBooking> bookingCar(String userId, String carId, String startDate, String endDate, String toDay) {
+
+    public Optional<CarBooking> bookingCar(User user, Car car, LocalDate startDate, LocalDate endDate) {
         CarBooking booking= null;
-        Car car = carService.getCarById(carId);
-        if(car.getName().equalsIgnoreCase("not found")) return Optional.ofNullable(booking);
-        LocalDate localStartDate = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        LocalDate localEndDate = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        LocalDate localToDay = LocalDate.parse(toDay, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        long days = ChronoUnit.DAYS.between(localStartDate, localEndDate) + 1;
+        if(null == car || null == user) return Optional.empty();
+        long days = ChronoUnit.DAYS.between(startDate, endDate) + 1;
         BigDecimal rentalPrice = car.getRentalPrice().multiply(new BigDecimal(days));
-        booking = new CarBooking(userId, carId, localToDay, localStartDate, localEndDate, rentalPrice);
+        booking = new CarBooking(user.getId().toString(), car.getId().toString(), toDay, startDate, endDate, rentalPrice);
         carBookingDao.addBooking(booking);
         return Optional.of(booking);
     }
 
     //Get all cars that are not booked during the given dates
-    public Car[] getAvailableCars(String[] dates) {
-        LocalDate startDate = LocalDate.parse(dates[0], DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        LocalDate endDate = LocalDate.parse(dates[1], DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+    public Car[] getAvailableCars(LocalDate[] dates, Car[] cars) {
         CarBooking[] bookings = carBookingDao.getBookings();
         StringBuilder carIdsString = new StringBuilder();
         for(int i=0; i<bookings.length; i++) {
-            if(isDateUnavailable(startDate, endDate, bookings[i])) {
+            if(isDateUnavailable(dates[0], dates[1], bookings[i])) {
                 if(!carIdsString.toString().contains(bookings[i].getCarID()))
                     carIdsString.append(bookings[i].getCarID()).append(",");
             }
@@ -51,7 +42,6 @@ public class CarBookingService {
         if(!carIdsString.isEmpty()) {
             carIdsString = new StringBuilder(carIdsString.substring(0, carIdsString.length() - 1));
             String[] carIds = carIdsString.toString().split(",");
-            Car[] cars = carService.getCars();
             Car[] availableCars = new Car[cars.length - carIds.length];
             int availableIndex = 0;
             for(int i=0; i<cars.length; i++) {
@@ -68,7 +58,7 @@ public class CarBookingService {
             }
                 return availableCars;
         }
-        return carService.getCars();
+        return cars;
     }
 
     //get all bookings
@@ -91,7 +81,7 @@ public class CarBookingService {
         if(booking.getStatus() == BookingStatus.CANCELLED) {
             return false;
         }
-        int days = Period.between(startDate, endDate).getDays() +1;
+        long days = ChronoUnit.DAYS.between(startDate, endDate) +1;
         for(int i=0; i<days; i++) {
             LocalDate dateToCheck = startDate.plusDays(i);
             if((booking.getStartDate().isEqual(dateToCheck) || booking.getEndDate().isEqual(dateToCheck)) ||
@@ -104,7 +94,26 @@ public class CarBookingService {
 
     //Asks CarBookingDao for booking by user id
     public CarBooking[] getBookingsByUser(String userId) {
-        return carBookingDao.getBookingsByUserId(userId).length > 0 ? carBookingDao.getBookingsByUserId(userId) : null;
+        return carBookingDao.getBookingsByUserId(userId);
+    }
+
+    public Optional<LocalDate[]> validateInputDates(DateTimeFormatter formater, String startDate, String endDate) {
+        LocalDate startLocalDate;
+        LocalDate endLocalDate;
+        LocalDate[] dates = new LocalDate[2];
+        try {
+            startLocalDate = LocalDate.parse(startDate, formater);
+            endLocalDate = LocalDate.parse(endDate, formater);
+
+        } catch (DateTimeParseException e) {
+            return Optional.empty();
+        }
+        if(startLocalDate.isAfter(endLocalDate)  || toDay.isAfter(startLocalDate)) {
+            return Optional.empty();
+        }
+        dates[0] = startLocalDate;
+        dates[1] = endLocalDate;
+        return Optional.of(dates);
     }
 }
 

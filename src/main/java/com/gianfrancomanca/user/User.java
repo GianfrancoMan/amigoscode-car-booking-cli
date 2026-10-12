@@ -9,9 +9,9 @@ public class User {
     private UUID id;
     private String name;
 
-    public User(String name) {
+    public User(String name, UUID id) {
         this.name = name;
-        id = UUID.randomUUID();
+        this.id = id;
     }
 
     public UUID getId() {
@@ -37,7 +37,7 @@ public class User {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof User user)) return false;
-        return Objects.equals(getId(), user.getId()) && Objects.equals(getName(), user.getName());
+        return Objects.equals(getId(), user.getId());
     }
 
     @Override

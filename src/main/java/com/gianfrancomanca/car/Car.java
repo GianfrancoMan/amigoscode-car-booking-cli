@@ -6,22 +6,22 @@ import java.util.UUID;
 
 public class Car {
     private UUID id;
-    private java.lang.String name;
-    private java.lang.String registrationNumber;
+    private String name;
+    private String registrationNumber;
     private BigDecimal rentalPrice;
     private boolean electric;
     public Brand brand;
 
-    public Car(Brand brand, java.lang.String name, java.lang.String registrationNumber, BigDecimal rentalPrice, boolean electric) {
+    public Car(UUID id, Brand brand, String name, String registrationNumber, BigDecimal rentalPrice, boolean electric) {
+        this.id = id;
         this.brand = brand;
         this.name = name;
         this.registrationNumber = registrationNumber;
         this.rentalPrice = rentalPrice;
         this.electric = electric;
-        id = UUID.randomUUID();
     }
 
-    public java.lang.String getName() {
+    public String getName() {
         return name;
     }
 
@@ -33,7 +33,7 @@ public class Car {
         return id;
     }
 
-    public java.lang.String getRegistrationNumber() {
+    public String getRegistrationNumber() {
         return registrationNumber;
     }
 
@@ -49,7 +49,7 @@ public class Car {
         this.electric = electric;
     }
 
-    public void setName(java.lang.String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -57,16 +57,12 @@ public class Car {
         this.brand = brand;
     }
 
-    public void setRegistrationNumber(java.lang.String registrationNumber) {
+    public void setRegistrationNumber(String registrationNumber) {
         this.registrationNumber = registrationNumber;
     }
 
     public void setRentalPrice(BigDecimal rentalPrice) {
         this.rentalPrice = rentalPrice;
-    }
-
-    public void setEletric(boolean eletric) {
-        this.electric = eletric;
     }
 
     @Override
@@ -84,7 +80,7 @@ public class Car {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Car car)) return false;
-        return Objects.equals(getId(), car.getId()) && Objects.equals(getRegistrationNumber(), car.getRegistrationNumber());
+        return Objects.equals(getId(), car.getId());
     }
 
     @Override

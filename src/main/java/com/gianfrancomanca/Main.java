@@ -1,5 +1,6 @@
 package com.gianfrancomanca;
 
+import com.gianfrancomanca.booking.BookingStatus;
 import com.gianfrancomanca.booking.CarBooking;
 import com.gianfrancomanca.booking.CarBookingService;
 import com.gianfrancomanca.car.Car;
@@ -10,31 +11,48 @@ import com.gianfrancomanca.user.UserService;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Optional;
 import java.util.Scanner;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
 
-    static Scanner scanner = new Scanner(System.in);
-    static CarBookingService carBookingService = CarBookingService.SingletonCarBookingService.getInstance();
-    static UserService userService = new UserService();
-    static CarService carService = new CarService();
+    private Scanner scanner;
+    private CarBookingService carBookingService;
+    private UserService userService;
+    private CarService carService;
+    private DateTimeFormatter formater;
+    LocalDate toDay;
 
+    public Main(Scanner scanner, CarBookingService carBookingService, UserService userService, CarService carService) {
+        this.scanner = scanner;
+        this.carBookingService = carBookingService;
+        this.userService = userService;
+        this.carService = carService;
+        this.formater = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        this.toDay = LocalDate.now();
+    }
+
+    /***MAIN METHOD***/
     static void main() {
-        userInterface();
+        Main mainReference = new Main(
+                new Scanner(System.in),
+                new CarBookingService(),
+                new UserService(),
+                new CarService());
+        mainReference.userInterface();
     }
 
     //main menu
-    public static void userInterface() {
-        int choice =0; boolean success = false;
-        while (choice != 8 || success==false) {
+    public void userInterface() {
+        int choice =0;
+        while (choice != 8) {
             printHeader("\nPlease type a number between 1 and 7 for operations or 8 to exit:");
             mainMenu();
             printHeader("Type your choice...");
             if(scanner.hasNextInt()) {
                 choice = checkChoice(scanner, 1, 8);
-                success = manageChoice(choice);
+                manageChoice(choice);
             }else {
                 scanner.nextLine();
             }
@@ -45,10 +63,7 @@ public class Main {
 
 
     //user choice to book a car
-    private static boolean manageBookCarView(Scanner scanner) {
-
-        DateTimeFormatter formater = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        LocalDate toDay = LocalDate.now();
+    private boolean manageBookCarView(Scanner scanner) {
 
         String userId = validateUserId(scanner);
         String username = "";
@@ -59,13 +74,13 @@ public class Main {
             return false;
         }
 
-        String[] serviceDates = validateServiceDates(scanner, toDay, username);
-        if(serviceDates[0] == null || serviceDates[1] == null) {
+        Optional<LocalDate[]> serviceDates = validateServiceDates(scanner, username);
+        if(serviceDates.isEmpty()) {
             printError("ERROR!! operation cancelled cause the start date is after the end date or the start date is in the past");
             return false;
         }
 
-        Car[] availableCars = carBookingService.getAvailableCars(serviceDates);
+        Car[] availableCars = carBookingService.getAvailableCars(serviceDates.get(), carService.getCars());
         if(availableCars.length == 0) {
             printHeader("No cars available for the selected period");
             return false;
@@ -74,14 +89,15 @@ public class Main {
         String carId = validateChosenCar(scanner, availableCars);
         if(!carId.isEmpty()) {
             user = userService.getUserById(userId);
+            Car car = carService.getCarById(carId).orElse(null);
             CarBooking booking =
-                    carBookingService.bookingCar(user.getId().toString(), carId, serviceDates[0], serviceDates[1], toDay.format(formater)).orElse(null);
+                    carBookingService.bookingCar(user, car,serviceDates.get()[0], serviceDates.get()[1]).orElse(null);
             if(booking != null) {
                 String[] elementsToPrint = createBookingElements(user, booking, carBookingService, formater);
                 printBooking(elementsToPrint);
             }
             else {
-                printError("ERROR!! Operation Failed");
+                printError("ERROR Operation Failed!!  please check the data you provided and try again.");
                 return false;
             }
         }
@@ -90,16 +106,22 @@ public class Main {
     }
 
     //user choice to see all the bookings
-    private static boolean manageAllBookingView() {
+    private boolean manageAllBookingView() {
         CarBooking[] bookings = carBookingService.getAllBookings();
-        String data[] = new String[bookings.length];
         if(null != bookings && bookings.length >= 0) {
+            String data[] = new String[bookings.length];
             for(int i=0; i<bookings.length; i++){
-                data[i] = "\n(" + (i+1) + ")\nBOOKING date: " + parseDateForView(bookings[i].getBookingDate()) + "\t\t id: " + bookings[i].getId().toString()
+                Car car = carService.getCarById(bookings[i].getCarID()).orElse(null);
+                if(null == car) {
+                    data[i] = "Not Found";
+                }
+                else {
+                    data[i] = "\n(" + (i+1) + ")\nBOOKING date: " + parseDateForView(bookings[i].getBookingDate()) + "\t\t id: " + bookings[i].getId().toString()
                         + "\nCUSTOMER\t\tname: " + userService.getUserById(bookings[i].getUserId()).getName() + "\t\tid: " + bookings[i].getUserId()
-                        +"\nCAR\t\t model: "  + carService.getCarById(bookings[i].getCarID()).getBrand().getName() + " " + carService.getCarById(bookings[i].getCarID()).getName() + "\t\tregistration number: " + carService.getCarById(bookings[i].getCarID()).getRegistrationNumber()
+                        +"\nCAR\t\t model: "  + car.getBrand().getName() + " " + car.getName() + "\t\tregistration number: " + car.getRegistrationNumber()
                         +"\nBOOKING PERIOD\t\tstart: " + parseDateForView(bookings[i].getStartDate()) + "\t\tend:  " + parseDateForView(bookings[i].getEndDate())
                         +"\nSTATUS: " + bookings[i].getStatus().getStatusName();
+                }
             }
             printAllBookings(data);
             return true;
@@ -109,7 +131,7 @@ public class Main {
     }
 
     //user choice to delete a booking
-    private static boolean manageDeleteBookingView(Scanner scanner) {
+    private boolean manageDeleteBookingView(Scanner scanner) {
         printHeader("Type the booking ID to delete it or \"Cancel\" to abort the operation:");
         if(scanner.hasNextLine()) scanner.nextLine();
         String userInput = scanner.nextLine();
@@ -129,7 +151,7 @@ public class Main {
     }
 
     //user choice to see all booking of a cutomer
-    private static boolean manageUsersBooking(Scanner scanner) {
+    private boolean manageUsersBooking(Scanner scanner) {
         printHeader("Type the user ID to see its bookings or \"Cancel\" to abort the operation:");
         if(scanner.hasNextLine()) scanner.nextLine();
         String userInput = scanner.nextLine();
@@ -145,10 +167,17 @@ public class Main {
                 printHeader("\nBookings made by "+ customerName + "...");
                 var data = new String[userBookings.length];
                 for(int i=0; i<userBookings.length; i++) {
-                    data[i] = "\n(" + (i+1) + ")\nBOOKING date: " + parseDateForView(userBookings[i].getBookingDate()) + "\t\t id: " + userBookings[i].getId().toString()
-                            + "\nCAR\t\t model: " + carService.getCarById(userBookings[i].getCarID()).getBrand().getName() + " " + carService.getCarById(userBookings[i].getCarID()).getName() + "\t\tregistration number: " + carService.getCarById(userBookings[i].getCarID()).getRegistrationNumber()
-                            +"\nBOOKING PERIOD\t\tstart: " + parseDateForView(userBookings[i].getStartDate()) + "\t\tend:  " + parseDateForView(userBookings[i].getEndDate())
-                            +"\nSTATUS: " + userBookings[i].getStatus().getStatusName();
+                    Car car = carService.getCarById(userBookings[i].getCarID()).orElse(null);
+                    if(null == car) {
+                        data[i] = "Not Found";
+                    }
+                    else {
+                        data[i] = "\n(" + (i+1) + ")\nBOOKING date: " + parseDateForView(userBookings[i].getBookingDate()) + "\t\t id: " + userBookings[i].getId().toString()
+                                + "\nCAR\t\t model: " + car.getBrand().getName() + " " + car.getName() + "\t\tregistration number: " + car.getRegistrationNumber()
+                                +"\nBOOKING PERIOD\t\tstart: " + parseDateForView(userBookings[i].getStartDate()) + "\t\tend:  " + parseDateForView(userBookings[i].getEndDate())
+                                +"\nSTATUS: " + userBookings[i].getStatus().getStatusName();
+                    }
+
                 }
                 printAllBookings(data);
                 return true;
@@ -161,25 +190,25 @@ public class Main {
     }
 
     //user choice to see all the cars of the fleet
-    private static boolean manageAllCarView() {
+    private boolean manageAllCarView() {
         printHeader(
                 "\n--------------------------------------------------------------"
                         + "\nAVAILABLE AND PARTIALLY AVAILABLE CARS ..."
                         + "\n---------------------------------------------------------------\n");
-        printArray(carService.getCarsAvailabilities());
+        printArray(getCarsAvailabilities());
         return  true;
     }
 
-    private static boolean manageAllElectricCarView() {
+    private boolean manageAllElectricCarView() {
         printHeader(
                 "\n-----------------------------------------------------------------------"
                         + "\nAVAILABLE AND PARTIALLY AVAILABLE ELECTRIC CARS ..."
                         + "\n------------------------------------------------------------------------\n");
-        printArray(carService.getElectricCarsAvailabilities());
+        printArray(getElectricCarsAvailabilities());
         return true;
     }
 
-    private static boolean manageAllUserView() {
+    private boolean manageAllUserView() {
         User[] users = userService.getAllUsers();
         String[] userData = new String[users.length];
         if(users.length > 0) {
@@ -194,7 +223,7 @@ public class Main {
     }
 
     //check if the user typed a valid number
-    private static int checkChoice(Scanner scanner, int min, int max) {
+    private int checkChoice(Scanner scanner, int min, int max) {
         int choice = scanner.nextInt();
         if (choice < min || choice > max) {
             return 0;
@@ -203,8 +232,8 @@ public class Main {
     }
 
     //manage the user's choice from the main menu'
-    private static boolean manageChoice(int choice) {
-        return  switch (choice) {
+    private void manageChoice(int choice) {
+        switch (choice) {
             case 1 -> manageBookCarView(scanner);
             case 2 -> manageDeleteBookingView(scanner);
             case 3 -> manageUsersBooking(scanner);
@@ -212,13 +241,11 @@ public class Main {
             case 5 -> manageAllCarView();
             case 6 -> manageAllElectricCarView();
             case 7 -> manageAllUserView();
-            case 8 -> true;
-            default -> false;
-        };
+        }
     }
 
     //manage the user's choice from the car menu
-    private static String manageCarChoice(int choice, Car[] cars) {
+    private String manageCarChoice(int choice, Car[] cars) {
         for (int i=0; i<cars.length; i++) {
             if(choice == (i+1)) return cars[i].getId().toString();
         }
@@ -226,7 +253,7 @@ public class Main {
     }
 
     //create the user data array
-    private static String[] createUserData(User [] users, String[] userData) {
+    private String[] createUserData(User [] users, String[] userData) {
         for(int i=0; i<users.length; i++) {
             userData[i] =String.format(" (%d)  Name: %-50s ID: %-50s", (i+1), users[i].getName(), users[i].getId().toString());
         }
@@ -234,20 +261,20 @@ public class Main {
     }
 
     //Ask for user name and validate the input
-    private static String validateUserId(Scanner scanner) {
+    private String validateUserId(Scanner scanner) {
         if(scanner.hasNextLine()) scanner.nextLine();
         printHeader("\n        Rental Car      \nType customer ID or \"Cancel\" to cancel the operation: ");
         String userInput = scanner.nextLine();
         while(userInput.isEmpty() || userInput.isBlank() || userInput.length() < 3 ) {
-            printError("Error! Name cannot be empty and should be at least of three characters, please type your name or \"Cancel\" to abort booking:");
+            printError("Error! Unique user ID cannot be empty, please type the unique ID or \"Cancel\" to abort booking:");
             userInput = scanner.nextLine();
         }
         return userInput;
     }
 
     //Ask for service dates and validate the input
-    private static String[] validateServiceDates(Scanner dateScanner, LocalDate toDay, String username) {
-        String[] dates = new String[2];
+    private Optional<LocalDate[]> validateServiceDates(Scanner dateScanner, String username) {
+        Optional<LocalDate[]> dates = Optional.of(new LocalDate[2]);
         String startDate, endDate ;
 
         printHeader("\n      Rental Car ->        " + username + "\nThe start date of the service... ");
@@ -260,19 +287,11 @@ public class Main {
             endDate = createDate(dateScanner);
         } while (endDate.isEmpty() || endDate.isBlank());
 
-        LocalDate startLocalDate = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        LocalDate endLocalDate = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        if(startLocalDate.isAfter(endLocalDate)  || toDay.isAfter(startLocalDate)) {
-            return dates;
-        }
-
-        dates[0] = startDate;
-        dates[1] = endDate;
-        return dates;
+        return carBookingService.validateInputDates(formater, startDate, endDate);
     }
 
     //create a date from the user input
-    private static String createDate(Scanner scanner) {
+    private String createDate(Scanner scanner) {
         String date = "";
         printSentence("type  the day of the month: ");
         String day = scanner.next() ;
@@ -292,7 +311,7 @@ public class Main {
         return date;
     }
 
-    private static String validateChosenCar(Scanner scanner, Car[] availableCars) {
+    private String validateChosenCar(Scanner scanner, Car[] availableCars) {
         int max = availableCars.length + 1;
         int choice =0; String  carId = "";
         while (choice != max && carId.isEmpty()) {
@@ -312,23 +331,26 @@ public class Main {
         return carId;
     }
 
-    private static String[] createBookingElements(User user, CarBooking booking, CarBookingService carBookingService, DateTimeFormatter formater) {
+    private String[] createBookingElements(User user, CarBooking booking, CarBookingService carBookingService, DateTimeFormatter formater) {
         String[] elementsToPrint = new String[6];
         elementsToPrint[0] = user.getId().toString();
         elementsToPrint[1] = user.getName();
-        elementsToPrint[2] = carService.getCarById(booking.getCarID().toString()).getBrand().getName() + " " + carService.getCarById(booking.getCarID().toString()).getName()+ "\t\tregistration number: " + carService.getCarById(booking.getCarID().toString()).getRegistrationNumber();
+        Car car = carService.getCarById(booking.getCarID().toString()).orElse(null);
+        elementsToPrint[2]  = (null == car)
+                ? "Not Found"
+                :  car.getBrand().getName() + " " + car.getName()+ "\t\tregistration number: " +car.getRegistrationNumber();
         elementsToPrint[3] = booking.getStartDate().format(formater);
         elementsToPrint[4] = booking.getEndDate().format(formater);
         elementsToPrint[5] = booking.getRentalPrice().toString();
         return elementsToPrint;
     }
 
-    private static String parseDateForView(LocalDate localDate) {
+    private String parseDateForView(LocalDate localDate) {
         return localDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
     }
 
     //print the main menu
-    public static void mainMenu() {
+    public void mainMenu() {
         System.out.println("| ---------------------------------------|");
         System.out.println("          Welcome to Car Rental!          ");
         System.out.println("-----------------------------------------");
@@ -344,7 +366,7 @@ public class Main {
     }
 
     //print the Car Menu
-    public static void carMenu(Car[] cars) {
+    public void carMenu(Car[] cars) {
         int i = 1;
         for (Car car : cars) {
             System.out.println(
@@ -358,7 +380,7 @@ public class Main {
         System.out.println("---------------------------------------------------------------");
     }
 
-    public static void printBooking(String[] data) {
+    public void printBooking(String[] data) {
 
         System.out.println("                Rental Car Booking Details:");
         System.out.println("-----------------------------------------------------------");
@@ -373,7 +395,7 @@ public class Main {
         System.out.println("-----------------------------------------------------------\n");
     }
 
-    public static void printArray(String[] data) {
+    public void printArray(String[] data) {
         if(data.length == 0) {
             System.out.println("Nothing to display.\n");
         }
@@ -383,7 +405,7 @@ public class Main {
         System.out.println("\n");
     }
 
-    public static void printAllBookings(String[] bookingsData) {
+    public void printAllBookings(String[] bookingsData) {
         System.out.println("                Rental Car Bookings List:");
         System.out.println("-----------------------------------------------------------");
         if(bookingsData.length == 0) {
@@ -395,17 +417,70 @@ public class Main {
         System.out.println("-----------------------------------------------------------");
     }
 
-    public static void printError(String error) {
+    public void printError(String error) {
         System.out.println("                Rental Car Booking Error:");
         System.out.println("-----------------------------------------------------------");
         System.out.println(error);
     }
 
-    public static void printHeader(String header) {
+    public void printHeader(String header) {
         System.out.println(header);
     }
 
-    public static void printSentence(String sentence) {
+    public void printSentence(String sentence) {
         System.out.print(sentence);
+    }
+
+    //get all cars availabilities
+    private String[] getCarsAvailabilities() {
+        String[] carIds  = carService.retrieveCarIds();
+        String[] availabilities = new String[carIds.length];
+        for(int i=0; i<carIds.length; i++) {
+            availabilities[i] = "("+ (i + 1) + ")" +createAvailabilities(carIds[i]);
+        }
+
+        return availabilities;
+    }
+
+    //get all electric cars availabilities
+    private String[] getElectricCarsAvailabilities() {
+        String[] eIds = carService.retrieveECarsIds();
+        String[] availabilities = new String[eIds.length];
+        for(int i=0; i<eIds.length; i++) {
+            availabilities[i] = "("+ (i + 1) + ")" +createAvailabilities(eIds[i]);
+        }
+
+        return availabilities;
+    }
+
+    //Create a string with the car availability
+    private String createAvailabilities(String carId) {
+        String checkedIds = "";
+        String availability = "";
+        String partialAvailability = "";
+        CarBooking[] bookings = carBookingService.getAllBookings();
+
+        Car car = carService.getCarById(carId).orElse(null);
+
+        availability += "\n" + car.getBrand().getName() + " " + car.getName() + " ";
+        for (CarBooking booking : bookings) {
+            if(booking.getCarID().equals(carId)) {
+                if(!checkedIds.contains(booking.getCarID())) {
+                    checkedIds  = booking.getCarID();
+                }
+                if(booking.getStatus() == BookingStatus.ACTIVE || booking.getStatus() == BookingStatus.BOOKED) {
+                    partialAvailability +=  "\tfrom " + booking.getStartDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+                            + " to " + booking.getEndDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+                            + "\n";
+                }
+            }
+        }
+        if(partialAvailability.isEmpty()) {
+            availability += "Currently available.\n";
+        } else {
+            availability += "Available except :\n" + partialAvailability;
+        }
+
+        return availability;
     }
 }
