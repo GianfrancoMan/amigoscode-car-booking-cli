@@ -47,9 +47,9 @@ public class Main {
     public void userInterface() {
         int choice =0;
         while (choice != 8) {
-            printHeader("\nPlease type a number between 1 and 7 for operations or 8 to exit:");
+            printSentence("\nPlease type a number between 1 and 7 for operations or 8 to exit:");
             mainMenu();
-            printHeader("Type your choice...");
+            printSentence("Type your choice then press enter: ");
             if(scanner.hasNextInt()) {
                 choice = checkChoice(scanner, 1, 8);
                 manageChoice(choice);
@@ -58,7 +58,7 @@ public class Main {
             }
         }
         scanner.close();
-        printHeader("Thank you for using our service, see you soon!\n");
+        printSentence("Thank you for using our service, see you soon!\n");
     }
 
 
@@ -82,7 +82,7 @@ public class Main {
 
         Car[] availableCars = carBookingService.getAvailableCars(serviceDates.get(), carService.getCars());
         if(availableCars.length == 0) {
-            printHeader("No cars available for the selected period");
+            printSentence("No cars available for the selected period");
             return false;
         }
 
@@ -117,10 +117,10 @@ public class Main {
                 }
                 else {
                     data[i] = "\n(" + (i+1) + ")\nBOOKING date: " + parseDateForView(bookings[i].getBookingDate()) + "\t\t id: " + bookings[i].getId().toString()
-                        + "\nCUSTOMER\t\tname: " + userService.getUserById(bookings[i].getUserId()).getName() + "\t\tid: " + bookings[i].getUserId()
-                        +"\nCAR\t\t model: "  + car.getBrand().getName() + " " + car.getName() + "\t\tregistration number: " + car.getRegistrationNumber()
-                        +"\nBOOKING PERIOD\t\tstart: " + parseDateForView(bookings[i].getStartDate()) + "\t\tend:  " + parseDateForView(bookings[i].getEndDate())
-                        +"\nSTATUS: " + bookings[i].getStatus().getStatusName();
+                            + "\nCUSTOMER\t\tname: " + userService.getUserById(bookings[i].getUserId()).getName() + "\t\tid: " + bookings[i].getUserId()
+                            +"\nCAR\t\t model: "  + car.getBrand().getName() + " " + car.getName() + "\t\tregistration number: " + car.getRegistrationNumber()
+                            +"\nBOOKING PERIOD\t\tstart: " + parseDateForView(bookings[i].getStartDate()) + "\t\tend:  " + parseDateForView(bookings[i].getEndDate())
+                            +"\nSTATUS: " + bookings[i].getStatus().getStatusName();
                 }
             }
             printAllBookings(data);
@@ -132,7 +132,7 @@ public class Main {
 
     //user choice to delete a booking
     private boolean manageDeleteBookingView(Scanner scanner) {
-        printHeader("Type the booking ID to delete it or \"Cancel\" to abort the operation:");
+        printSentence("Type the booking ID to delete it or \"Cancel\" to abort the operation:");
         if(scanner.hasNextLine()) scanner.nextLine();
         String userInput = scanner.nextLine();
         while(userInput.isEmpty() || userInput.isBlank()) {
@@ -142,7 +142,7 @@ public class Main {
         if(!userInput.equalsIgnoreCase("cancel"))  {
             boolean deleted = carBookingService.cancelBooking(userInput);
             if(deleted) {
-                printHeader("Booking deleted successfully");
+                printSentence("Booking deleted successfully");
                 return true;
             }
             printError("Operation failed!! possible causes: booking not exists or the booking is currently active or completed");
@@ -152,7 +152,7 @@ public class Main {
 
     //user choice to see all booking of a cutomer
     private boolean manageUsersBooking(Scanner scanner) {
-        printHeader("Type the user ID to see its bookings or \"Cancel\" to abort the operation:");
+        printSentence("Type the user ID to see its bookings or \"Cancel\" to abort the operation:");
         if(scanner.hasNextLine()) scanner.nextLine();
         String userInput = scanner.nextLine();
         while(userInput.isEmpty() || userInput.isBlank()) {
@@ -164,7 +164,7 @@ public class Main {
             if(null != userBookings && userBookings.length != 0) {
                 String customerName =
                         userService.getUserById(userInput).getName().equalsIgnoreCase("not found") ? "customer" : userService.getUserById(userInput).getName();
-                printHeader("\nBookings made by "+ customerName + "...");
+                printSentence("\nBookings made by "+ customerName + "...");
                 var data = new String[userBookings.length];
                 for(int i=0; i<userBookings.length; i++) {
                     Car car = carService.getCarById(userBookings[i].getCarID()).orElse(null);
@@ -182,9 +182,9 @@ public class Main {
                 printAllBookings(data);
                 return true;
             } else
-                printHeader("Operation failed!! No bookings found for the user or the user does not exist\n");
+                printSentence("Operation failed!! No bookings found for the user or the user does not exist\n");
         } else
-            printHeader("Operation cancelled successfully\n");
+            printSentence("Operation cancelled successfully\n");
 
         return true;
     }
@@ -263,7 +263,7 @@ public class Main {
     //Ask for user name and validate the input
     private String validateUserId(Scanner scanner) {
         if(scanner.hasNextLine()) scanner.nextLine();
-        printHeader("\n        Rental Car      \nType customer ID or \"Cancel\" to cancel the operation: ");
+        printSentence("\n        Rental Car      \nType customer ID or \"Cancel\" to cancel the operation: ");
         String userInput = scanner.nextLine();
         while(userInput.isEmpty() || userInput.isBlank() || userInput.length() < 3 ) {
             printError("Error! Unique user ID cannot be empty, please type the unique ID or \"Cancel\" to abort booking:");
@@ -277,12 +277,12 @@ public class Main {
         Optional<LocalDate[]> dates = Optional.of(new LocalDate[2]);
         String startDate, endDate ;
 
-        printHeader("\n      Rental Car ->        " + username + "\nThe start date of the service... ");
+        printSentence("\n      Rental Car ->        " + username + "\nThe start date of the service... ");
         do {
             startDate = createDate(dateScanner);
         } while (startDate.isEmpty() || startDate.isBlank());
 
-        printHeader("\n      Rental Car       " + "\nThe end date of the service... ");
+        printSentence("\n      Rental Car       " + "\nThe end date of the service... ");
         do {
             endDate = createDate(dateScanner);
         } while (endDate.isEmpty() || endDate.isBlank());
@@ -317,7 +317,7 @@ public class Main {
         while (choice != max && carId.isEmpty()) {
             printHeader("\n\n           CARS AVAILABLE FOR THE SELECTED PERIOD   \n------------------------------------------------------------------");
             carMenu(availableCars);
-            printHeader("Type your choice...");
+            printSentence("Type your choice then press enter: ");
             if(scanner.hasNextInt()) {
                 choice = checkChoice(scanner, 1, max);
                 carId = manageCarChoice(choice, availableCars);
@@ -351,7 +351,7 @@ public class Main {
 
     //print the main menu
     public void mainMenu() {
-        System.out.println("| ---------------------------------------|");
+        System.out.println("\n| ---------------------------------------|");
         System.out.println("          Welcome to Car Rental!          ");
         System.out.println("-----------------------------------------");
         System.out.println("|   1 to book a car                            |");
