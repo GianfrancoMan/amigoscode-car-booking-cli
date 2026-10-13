@@ -12,10 +12,11 @@ import java.util.Optional;
 
 public class CarBookingService {
 
-    private final CarBookingDao carBookingDao = new CarBookingDao();
+    private final CarBookingDao carBookingDao;
     private LocalDate toDay;
 
-    public CarBookingService() {
+    public CarBookingService(CarBookingDao carBookingDao) {
+        this.carBookingDao = carBookingDao;
         toDay = LocalDate.now();
     }
 
