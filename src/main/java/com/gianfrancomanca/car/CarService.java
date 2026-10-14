@@ -3,7 +3,11 @@ package com.gianfrancomanca.car;
 import java.util.Optional;
 
 public class CarService {
-    private final CarDao carDao = new CarDao();
+    private final CarDao carDao;
+
+    public CarService(CarDao carDao) {
+        this.carDao = carDao;
+    }
 
     //get all cars
     public Car[] getCars() {

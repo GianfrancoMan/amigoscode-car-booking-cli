@@ -5,8 +5,10 @@ import com.gianfrancomanca.booking.CarBooking;
 import com.gianfrancomanca.booking.CarBookingArrayDataAccessService;
 import com.gianfrancomanca.booking.CarBookingService;
 import com.gianfrancomanca.car.Car;
+import com.gianfrancomanca.car.CarArrayDataSourceService;
 import com.gianfrancomanca.car.CarService;
 import com.gianfrancomanca.user.User;
+import com.gianfrancomanca.user.UserArrayDataSourceService;
 import com.gianfrancomanca.user.UserService;
 
 import java.time.LocalDate;
@@ -39,8 +41,8 @@ public class Main {
         Main mainReference = new Main(
                 new Scanner(System.in),
                 new CarBookingService(new CarBookingArrayDataAccessService()),
-                new UserService(),
-                new CarService());
+                new UserService(new UserArrayDataSourceService()),
+                new CarService(new CarArrayDataSourceService()));
         mainReference.userInterface();
     }
 
