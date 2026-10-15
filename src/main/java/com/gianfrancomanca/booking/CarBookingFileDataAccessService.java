@@ -2,7 +2,8 @@ package com.gianfrancomanca.booking;
 
 
 
-import java.io.*;
+import com.gianfrancomanca.util.FileManager;
+
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -13,20 +14,21 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
 
     public CarBookingFileDataAccessService(String filePath) {
         this.filePath = filePath;
-        readFromFile();
+        this.initializeBookings();
         index = bookings.length;
     }
+
     @Override
     public CarBooking[] getBookings() {
-        readFromFile();
+        bookings = (CarBooking[]) FileManager.readFromFile(filePath);
         setStatus();
-        writeToFile(bookings);
+        FileManager.writeToFile(bookings, filePath);
         return bookings;
     }
 
     @Override
     public void addBooking(CarBooking booking) {
-        readFromFile();
+        bookings = (CarBooking[]) FileManager.readFromFile(filePath);
         index = bookings.length + 1;
         CarBooking[] bookingsHelper = new CarBooking[index];
         if(bookingsHelper.length == 1) bookingsHelper[0] = booking;
@@ -38,14 +40,14 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
         }
         bookings = bookingsHelper;
         setStatus();
-        writeToFile(bookings);
+        FileManager.writeToFile(bookings, filePath);
     }
 
     @Override
     public Optional<CarBooking> getBookingById(String id) {
-        readFromFile();
+        bookings = (CarBooking[]) FileManager.readFromFile(filePath);
         setStatus();
-        writeToFile(bookings);
+        FileManager.writeToFile(bookings, filePath);
         for(CarBooking booking : bookings) {
             if(booking.getId().toString().equals(id)) return Optional.of(booking);
         }
@@ -54,11 +56,11 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
 
     @Override
     public boolean cancelBookingById(String id) {
-        readFromFile();
+        bookings = (CarBooking[]) FileManager.readFromFile(filePath);
         for (CarBooking booking : bookings) {
             if (booking.getId().toString().equals(id) && booking.getStatus() != BookingStatus.ACTIVE && booking.getStatus() != BookingStatus.COMPLETED) {
                 booking.setStatus(BookingStatus.CANCELLED);
-                writeToFile(bookings);
+                FileManager.writeToFile(bookings, filePath);
                 return true;
             }
         }
@@ -67,9 +69,9 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
 
     @Override
     public CarBooking[] getBookingsByUserId(String userId) {
-        readFromFile();
+        bookings = (CarBooking[]) FileManager.readFromFile(filePath);
         setStatus();
-        writeToFile(bookings);
+        FileManager.writeToFile(bookings, filePath);
         CarBooking[] userBookings;
         int bookingLength = 0;
 
@@ -105,19 +107,14 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
         }
     }
 
-    private void writeToFile(CarBooking[] bookings) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
-            oos.writeObject(bookings);
-        } catch (IOException e) {
-            System.out.println("exception occurred");
-        }
-    }
-
-    private void readFromFile() {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
-            bookings = (CarBooking[]) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("exception occurred\n" + e );
+    /*
+     * Initialize the bookings array if it is null and write it to the file.
+     */
+    private void initializeBookings() {
+        bookings = (CarBooking[]) FileManager.readFromFile(filePath);
+        if(null == bookings) {
+            bookings = new CarBooking[0];
+            FileManager.writeToFile(bookings, filePath);
         }
     }
 }
