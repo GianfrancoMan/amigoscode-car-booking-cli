@@ -1,9 +1,6 @@
 package com.gianfrancomanca;
 
-import com.gianfrancomanca.booking.BookingStatus;
-import com.gianfrancomanca.booking.CarBooking;
-import com.gianfrancomanca.booking.CarBookingArrayDataAccessService;
-import com.gianfrancomanca.booking.CarBookingService;
+import com.gianfrancomanca.booking.*;
 import com.gianfrancomanca.car.Car;
 import com.gianfrancomanca.car.CarArrayDataSourceService;
 import com.gianfrancomanca.car.CarService;
@@ -40,7 +37,7 @@ public class Main {
     static void main() {
         Main mainReference = new Main(
                 new Scanner(System.in),
-                new CarBookingService(new CarBookingArrayDataAccessService()),
+                new CarBookingService(new CarBookingFileDataAccesService("src/main/resources/car-data-source.cs")),
                 new UserService(new UserArrayDataSourceService()),
                 new CarService(new CarArrayDataSourceService()));
         mainReference.userInterface();
