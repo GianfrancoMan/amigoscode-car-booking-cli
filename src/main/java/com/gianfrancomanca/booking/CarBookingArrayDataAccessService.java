@@ -14,13 +14,13 @@ public class CarBookingArrayDataAccessService  implements CarBookingDao {
         bookings = new CarBooking[index];
     }
 
-    //get all bookings
+    @Override
     public CarBooking[] getBookings() {
         setStatus();
         return bookings;
     }
 
-    //add a new booking
+    @Override
     public void addBooking(CarBooking booking) {
         index++;
         CarBooking[] bookingsHelper = new CarBooking[index];
@@ -35,7 +35,7 @@ public class CarBookingArrayDataAccessService  implements CarBookingDao {
         setStatus();
     }
 
-    //get a booking by its id
+    @Override
     public Optional<CarBooking> getBookingById(String id) {
         setStatus();
         for(CarBooking booking : bookings) {
@@ -44,7 +44,7 @@ public class CarBookingArrayDataAccessService  implements CarBookingDao {
         return Optional.ofNullable(null);
     }
 
-    //cancel a booking based on its id and current status
+    @Override
     public boolean cancelBookingById(String id) {
         for (CarBooking booking : bookings) {
             if (booking.getId().toString().equals(id) && booking.getStatus() != BookingStatus.ACTIVE && booking.getStatus() != BookingStatus.COMPLETED) {
@@ -55,7 +55,7 @@ public class CarBookingArrayDataAccessService  implements CarBookingDao {
         return false;
     }
 
-    //get all bookings of a specific user
+    @Override
     public CarBooking[] getBookingsByUserId(String userId) {
         setStatus();
         CarBooking[] userBookings;
