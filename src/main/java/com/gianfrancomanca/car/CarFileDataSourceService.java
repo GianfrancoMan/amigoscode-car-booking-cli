@@ -6,22 +6,21 @@ import java.io.*;
 import java.util.Optional;
 
 public class CarFileDataSourceService implements CarDao {
-    public  Car[] cars;
-    String filePath;
+    private final  Car[] cars;
+    private final String filePath;
 
-    //Cars static initialization
     public CarFileDataSourceService(String filePath) {
         this.filePath = filePath;
         cars = (Car[])FileManager.readFromFile(filePath);
     }
 
 
-    //get all cars
+    @Override
     public Car[] getCars() {
         return cars;
     }
 
-    //retrieve a car by id
+    @Override
     public Optional<Car> getCarById(String id) {
         for(Car car : cars) {
             if(car.getId().toString().equals(id)) return Optional.of(car);
@@ -30,7 +29,7 @@ public class CarFileDataSourceService implements CarDao {
     }
 
 
-
+// used one time to store seeded cars
 //    static void main() {
 //        Car[] cars = new Car[6];
 //        cars[0] = new Car(UUID.fromString("16fe24a0-fac0-400e-8e9c-14c8d0c54808"), Brand.FORD, "Focus","EF482LM", new BigDecimal("55.00"), false);

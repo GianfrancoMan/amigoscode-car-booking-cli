@@ -6,12 +6,12 @@ import java.io.*;
 import java.time.LocalDate;
 import java.util.Optional;
 
-public class CarBookingFileDataAccesService  implements CarBookingDao{
-    private static int index = 0;
-    private CarBooking[] bookings;
+public class CarBookingFileDataAccessService implements CarBookingDao{
+    private  int index;
+    private  CarBooking[] bookings;
     private final String filePath;
 
-    public CarBookingFileDataAccesService(String filePath) {
+    public CarBookingFileDataAccessService(String filePath) {
         this.filePath = filePath;
         readFromFile();
         index = bookings.length;

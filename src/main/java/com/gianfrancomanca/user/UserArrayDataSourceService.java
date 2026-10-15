@@ -15,12 +15,12 @@ public class UserArrayDataSourceService implements UserDao {
     }
 
 
-    //retrieve all users
+    @Override
     public User[] getUsers() {
         return users;
     }
 
-    //retrieve a user by id
+    @Override
     public Optional<User> getUserById(String id) {
         for(User user : getUsers()) {
             if(user.getId().toString().equals(id)) return Optional.of(user);
