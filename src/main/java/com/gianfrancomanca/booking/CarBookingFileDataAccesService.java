@@ -20,6 +20,7 @@ public class CarBookingFileDataAccesService  implements CarBookingDao{
     public CarBooking[] getBookings() {
         readFromFile();
         setStatus();
+        writeToFile(bookings);
         return bookings;
     }
 
@@ -44,6 +45,7 @@ public class CarBookingFileDataAccesService  implements CarBookingDao{
     public Optional<CarBooking> getBookingById(String id) {
         readFromFile();
         setStatus();
+        writeToFile(bookings);
         for(CarBooking booking : bookings) {
             if(booking.getId().toString().equals(id)) return Optional.of(booking);
         }
@@ -67,6 +69,7 @@ public class CarBookingFileDataAccesService  implements CarBookingDao{
     public CarBooking[] getBookingsByUserId(String userId) {
         readFromFile();
         setStatus();
+        writeToFile(bookings);
         CarBooking[] userBookings;
         int bookingLength = 0;
 
@@ -117,26 +120,4 @@ public class CarBookingFileDataAccesService  implements CarBookingDao{
             System.out.println("exception occurred\n" + e );
         }
     }
-
-//    static void main() {
-//        CarBooking[] bookings = new CarBooking[0];
-//
-//        try (FileOutputStream fos = new FileOutputStream("src/main/resources/car-data-source.cs", true); ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-//            System.out.println("Writing to file...");
-//            oos.writeObject(bookings);
-//            System.out.println("Done.");
-//        } catch (IOException e) {
-//            System.out.println("exception occurred");
-//        }
-//
-//        try(FileInputStream fin = new FileInputStream("src/main/resources/car-data-source.cs"); ObjectInputStream ois = new ObjectInputStream(fin)) {
-//            System.out.println("Reading from file...");
-//            bookings = (CarBooking[]) ois.readObject();
-//            System.out.println(Arrays.toString(bookings));
-//            System.out.println("Done.");
-//        } catch (IOException | ClassNotFoundException e) {
-//            System.out.println("exception occurred\n" + e );
-//        }
-//
-//    }
 }
