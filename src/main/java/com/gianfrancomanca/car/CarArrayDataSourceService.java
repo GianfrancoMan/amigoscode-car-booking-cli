@@ -17,7 +17,6 @@ public class CarArrayDataSourceService implements CarDao {
         cars[5] = new Car(UUID.fromString("120d0a56-fe20-4398-b593-5e35b8f1a64c"), Brand.RENAULT, "Megane E-Tech Electric", "ZX 482 QL", new BigDecimal("105.00"), true);
     }
 
-
     //get all cars
     public Car[] getCars() {
         return cars;

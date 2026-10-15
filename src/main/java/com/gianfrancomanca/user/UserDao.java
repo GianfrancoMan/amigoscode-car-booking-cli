@@ -1,7 +1,6 @@
 package com.gianfrancomanca.user;
 
 import java.util.Optional;
-import java.util.UUID;
 
 public interface UserDao {
 

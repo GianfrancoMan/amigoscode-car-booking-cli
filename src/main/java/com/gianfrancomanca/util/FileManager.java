@@ -1,13 +1,8 @@
 package com.gianfrancomanca.util;
 
-import com.gianfrancomanca.booking.CarBooking;
-import com.gianfrancomanca.car.Car;
-
 import java.io.*;
 
 public class FileManager {
-
-
 
     public static void writeToFile(Object[] objects, String filePath) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
