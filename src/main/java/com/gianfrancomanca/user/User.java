@@ -1,10 +1,11 @@
 package com.gianfrancomanca.user;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
 //A user has a system-generated unique identifier and a name.
-public class User {
+public class User implements Serializable {
 
     private UUID id;
     private String name;
