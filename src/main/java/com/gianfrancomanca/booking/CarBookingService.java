@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+import java.util.UUID;
 
 public class CarBookingService {
 
@@ -74,12 +75,12 @@ public class CarBookingService {
 
     //cancel a booking
     public boolean cancelBooking(String id) {
-        return carBookingDao.deleteBookingById(id);
+        return carBookingDao.deleteBookingById(UUID.fromString(id));
     }
 
     //check if the given dates are unavailable based on the booking requirement
     private boolean isDateUnavailable(LocalDate startDate, LocalDate endDate, CarBooking booking) {
-        if(booking.getStatus() == BookingStatus.CANCELLED) {
+        if(booking.getStatus() == BookingStatus.CANCELED) {
             return false;
         }
         long days = ChronoUnit.DAYS.between(startDate, endDate) +1;

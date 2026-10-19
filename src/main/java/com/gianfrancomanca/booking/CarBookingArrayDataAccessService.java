@@ -2,6 +2,7 @@ package com.gianfrancomanca.booking;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 
 public class CarBookingArrayDataAccessService  implements CarBookingDao {
 
@@ -39,16 +40,19 @@ public class CarBookingArrayDataAccessService  implements CarBookingDao {
     public Optional<CarBooking> findBookingById(String id) {
         setStatus();
         for(CarBooking booking : bookings) {
-            if(booking.getId().toString().equals(id)) return Optional.of(booking);
+            if(booking.getId().equals(id)) return Optional.of(booking);
         }
         return Optional.ofNullable(null);
     }
 
     @Override
-    public boolean deleteBookingById(String id) {
+    public boolean deleteBookingById(UUID id) {
         for (CarBooking booking : bookings) {
-            if (booking.getId().toString().equals(id) && booking.getStatus() != BookingStatus.ACTIVE && booking.getStatus() != BookingStatus.COMPLETED) {
-                booking.setStatus(BookingStatus.CANCELLED);
+            if (booking.getId().equals(id)
+                    && booking.getStatus() != BookingStatus.ACTIVE
+                    && booking.getStatus() != BookingStatus.COMPLETED
+                    && booking.getStatus() != BookingStatus.CANCELED) {
+                booking.setStatus(BookingStatus.CANCELED);
                 return true;
             }
         }
@@ -82,7 +86,7 @@ public class CarBookingArrayDataAccessService  implements CarBookingDao {
     private void setStatus() {
         for (CarBooking booking : bookings) {
             LocalDate today = LocalDate.now();
-            if (booking.getStatus() != BookingStatus.CANCELLED) {
+            if (booking.getStatus() != BookingStatus.CANCELED) {
                 if ((booking.getStartDate().isEqual(today) || booking.getEndDate().isEqual(today)) ||
                         (booking.getStartDate().isBefore(today) && booking.getEndDate().isAfter(today))) {
                     booking.setStatus(BookingStatus.ACTIVE);

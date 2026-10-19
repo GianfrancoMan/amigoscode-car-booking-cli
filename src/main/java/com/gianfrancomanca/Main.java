@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class Main {
 
@@ -140,7 +141,7 @@ public class Main {
                 printSentence("Booking deleted successfully");
                 return true;
             }
-            printError("Operation failed!! possible causes: booking not exists or the booking is currently active or completed");
+            printError("Operation failed!! possible causes: booking not exists or the booking is currently active, completed or already canceled");
         }
         return true;
     }
