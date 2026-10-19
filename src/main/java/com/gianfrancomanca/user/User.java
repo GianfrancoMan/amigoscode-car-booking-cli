@@ -7,6 +7,8 @@ import java.util.UUID;
 //A user has a system-generated unique identifier and a name.
 public class User implements Serializable {
 
+    private static final long serialVersionUID = 300000003L;
+
     private UUID id;
     private String name;
 

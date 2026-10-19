@@ -6,6 +6,9 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class Car implements Serializable {
+
+    private static final long serialVersionUID = 200000002L;
+
     private UUID id;
     private String name;
     private String registrationNumber;
