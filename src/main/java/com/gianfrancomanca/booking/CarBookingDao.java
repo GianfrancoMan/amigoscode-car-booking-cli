@@ -5,9 +5,9 @@ import java.util.Optional;
 public interface CarBookingDao {
 
     CarBooking[] getBookings();
-    void addBooking(CarBooking booking);
-    Optional<CarBooking> getBookingById(String id);
-    boolean cancelBookingById(String id);
+    void saveBooking(CarBooking booking);
+    Optional<CarBooking> findBookingById(String id);
+    boolean deleteBookingById(String id);
     CarBooking[] getBookingsByUserId(String userId);
 
 }

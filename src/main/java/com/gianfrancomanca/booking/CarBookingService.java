@@ -26,7 +26,7 @@ public class CarBookingService {
         long days = ChronoUnit.DAYS.between(startDate, endDate) + 1;
         BigDecimal rentalPrice = car.getRentalPrice().multiply(new BigDecimal(days));
         booking = new CarBooking(user.getId().toString(), car.getId().toString(), toDay, startDate, endDate, rentalPrice);
-        carBookingDao.addBooking(booking);
+        carBookingDao.saveBooking(booking);
         return Optional.of(booking);
     }
 
@@ -69,12 +69,12 @@ public class CarBookingService {
 
     //get a booking by its id
     public CarBooking getBookingById(String id) {
-        return carBookingDao.getBookingById(id).orElse(null);
+        return carBookingDao.findBookingById(id).orElse(null);
     }
 
     //cancel a booking
     public boolean cancelBooking(String id) {
-        return carBookingDao.cancelBookingById(id);
+        return carBookingDao.deleteBookingById(id);
     }
 
     //check if the given dates are unavailable based on the booking requirement

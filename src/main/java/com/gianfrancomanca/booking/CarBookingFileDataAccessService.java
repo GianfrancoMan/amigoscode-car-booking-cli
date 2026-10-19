@@ -27,7 +27,7 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
     }
 
     @Override
-    public void addBooking(CarBooking booking) {
+    public void saveBooking(CarBooking booking) {
         bookings = (CarBooking[]) FileManager.readFromFile(filePath);
         index = bookings.length + 1;
         CarBooking[] bookingsHelper = new CarBooking[index];
@@ -44,7 +44,7 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
     }
 
     @Override
-    public Optional<CarBooking> getBookingById(String id) {
+    public Optional<CarBooking> findBookingById(String id) {
         bookings = (CarBooking[]) FileManager.readFromFile(filePath);
         setStatus();
         FileManager.writeToFile(bookings, filePath);
@@ -55,7 +55,7 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
     }
 
     @Override
-    public boolean cancelBookingById(String id) {
+    public boolean deleteBookingById(String id) {
         bookings = (CarBooking[]) FileManager.readFromFile(filePath);
         for (CarBooking booking : bookings) {
             if (booking.getId().toString().equals(id) && booking.getStatus() != BookingStatus.ACTIVE && booking.getStatus() != BookingStatus.COMPLETED) {
