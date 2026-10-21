@@ -1,10 +1,14 @@
 package com.gianfrancomanca.car;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Car {
+public class Car implements Serializable {
+
+    private static final long serialVersionUID = 200000002L;
+
     private UUID id;
     private String name;
     private String registrationNumber;

@@ -1,11 +1,15 @@
 package com.gianfrancomanca.booking;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
-public class CarBooking {
+public class CarBooking implements Serializable {
+
+    private static final long serialVersionUID = 100000001L;
+
     private UUID id;
     private String userId;
     private String carID;
@@ -90,6 +94,7 @@ public class CarBooking {
     @Override
     public String toString() {
         return "CarBooking{" +
+                "id=" + id +
                 "userId='" + userId + '\'' +
                 ", carID='" + carID + '\'' +
                 ", bookingDate=" + bookingDate +

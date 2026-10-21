@@ -3,7 +3,7 @@ package com.gianfrancomanca.booking;
 public enum BookingStatus {
     BOOKED("Booked"),
     ACTIVE("Active"),
-    CANCELLED( "Cancelled"),
+    CANCELED( "Canceled"),
     COMPLETED( "Completed");
 
     private String statusName;

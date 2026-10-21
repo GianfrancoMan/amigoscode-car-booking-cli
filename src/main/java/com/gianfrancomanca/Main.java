@@ -1,20 +1,16 @@
 package com.gianfrancomanca;
 
-import com.gianfrancomanca.booking.BookingStatus;
-import com.gianfrancomanca.booking.CarBooking;
-import com.gianfrancomanca.booking.CarBookingService;
-import com.gianfrancomanca.car.Car;
-import com.gianfrancomanca.car.CarService;
-import com.gianfrancomanca.user.User;
-import com.gianfrancomanca.user.UserService;
+import com.gianfrancomanca.booking.*;
+import com.gianfrancomanca.car.*;
+import com.gianfrancomanca.user.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.UUID;
 
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
 
     private Scanner scanner;
@@ -37,9 +33,9 @@ public class Main {
     static void main() {
         Main mainReference = new Main(
                 new Scanner(System.in),
-                new CarBookingService(),
-                new UserService(),
-                new CarService());
+                new CarBookingService(new CarBookingFileDataAccessService("src/main/resources/carbooking-file-data-source.cs")),
+                new UserService(new UserFileDataSourceService("src/main/resources/user-file-data-source.cs")),
+                new CarService(new CarFileDataSourceService("src/main/resources/car-file-data-source.cs")));
         mainReference.userInterface();
     }
 
@@ -145,7 +141,7 @@ public class Main {
                 printSentence("Booking deleted successfully");
                 return true;
             }
-            printError("Operation failed!! possible causes: booking not exists or the booking is currently active or completed");
+            printError("Operation failed!! possible causes: booking not exists or the booking is currently active, completed or already canceled");
         }
         return true;
     }

@@ -9,13 +9,15 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+import java.util.UUID;
 
 public class CarBookingService {
 
-    private final CarBookingDao carBookingDao = new CarBookingDao();
+    private final CarBookingDao carBookingDao;
     private LocalDate toDay;
 
-    public CarBookingService() {
+    public CarBookingService(CarBookingDao carBookingDao) {
+        this.carBookingDao = carBookingDao;
         toDay = LocalDate.now();
     }
 
@@ -25,7 +27,7 @@ public class CarBookingService {
         long days = ChronoUnit.DAYS.between(startDate, endDate) + 1;
         BigDecimal rentalPrice = car.getRentalPrice().multiply(new BigDecimal(days));
         booking = new CarBooking(user.getId().toString(), car.getId().toString(), toDay, startDate, endDate, rentalPrice);
-        carBookingDao.addBooking(booking);
+        carBookingDao.saveBooking(booking);
         return Optional.of(booking);
     }
 
@@ -68,17 +70,17 @@ public class CarBookingService {
 
     //get a booking by its id
     public CarBooking getBookingById(String id) {
-        return carBookingDao.getBookingById(id).orElse(null);
+        return carBookingDao.findBookingById(id).orElse(null);
     }
 
     //cancel a booking
     public boolean cancelBooking(String id) {
-        return carBookingDao.cancelBookingById(id);
+        return carBookingDao.deleteBookingById(UUID.fromString(id));
     }
 
     //check if the given dates are unavailable based on the booking requirement
     private boolean isDateUnavailable(LocalDate startDate, LocalDate endDate, CarBooking booking) {
-        if(booking.getStatus() == BookingStatus.CANCELLED) {
+        if(booking.getStatus() == BookingStatus.CANCELED) {
             return false;
         }
         long days = ChronoUnit.DAYS.between(startDate, endDate) +1;
