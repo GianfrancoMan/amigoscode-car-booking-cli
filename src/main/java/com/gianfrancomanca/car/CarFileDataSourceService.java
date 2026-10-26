@@ -3,20 +3,24 @@ package com.gianfrancomanca.car;
 import com.gianfrancomanca.util.FileManager;
 
 import java.io.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class CarFileDataSourceService implements CarDao {
-    private final  Car[] cars;
+    private final  List<Car> cars;
     private final String filePath;
 
     public CarFileDataSourceService(String filePath) {
         this.filePath = filePath;
-        cars = (Car[])FileManager.readFromFile(filePath);
+        cars = (List<Car>)FileManager.readFromFile(filePath);
     }
 
 
     @Override
-    public Car[] getCars() {
+    public List<Car> getCars() {
         return cars;
     }
 
@@ -27,5 +31,4 @@ public class CarFileDataSourceService implements CarDao {
         }
         return Optional.empty();
     }
-
 }

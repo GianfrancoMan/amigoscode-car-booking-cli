@@ -1,6 +1,8 @@
 package com.gianfrancomanca.booking;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -9,30 +11,21 @@ public class CarBookingArrayDataAccessService  implements CarBookingDao {
     static int index = 0;
 
     //The where bookings are stored
-    private CarBooking[] bookings;
+    private List<CarBooking> bookings;
 
     public CarBookingArrayDataAccessService() {
-        bookings = new CarBooking[index];
+        bookings = new ArrayList<>();
     }
 
     @Override
-    public CarBooking[] getBookings() {
+    public List<CarBooking> getBookings() {
         setStatus();
         return bookings;
     }
 
     @Override
     public void saveBooking(CarBooking booking) {
-        index++;
-        CarBooking[] bookingsHelper = new CarBooking[index];
-        if(bookingsHelper.length == 1) bookingsHelper[0] = booking;
-        else {
-            for (int i = 0; i < bookings.length; i++) {
-                bookingsHelper[i] = bookings[i];
-            }
-            bookingsHelper[index-1] = booking;
-        }
-        bookings = bookingsHelper;
+        bookings.add(booking);
         setStatus();
     }
 
@@ -60,22 +53,16 @@ public class CarBookingArrayDataAccessService  implements CarBookingDao {
     }
 
     @Override
-    public CarBooking[] getBookingsByUserId(String userId) {
+    public List<CarBooking> getBookingsByUserId(String userId) {
         setStatus();
-        CarBooking[] userBookings;
+        List<CarBooking> userBookings;
         int bookingLength = 0;
 
-        for(CarBooking booking : bookings)
-            if(booking.getUserId().toString().equals(userId))
-                bookingLength++;
-
-        userBookings = new CarBooking[bookingLength];
-        int userBookingsIndex = 0;
-        if(userBookings.length > 0) {
+        userBookings = new ArrayList<>();
+        if(userBookings.size() > 0) {
             for(CarBooking booking : bookings) {
                 if (booking.getUserId().toString().equals(userId)) {
-                    userBookings[userBookingsIndex] = booking;
-                    userBookingsIndex++;
+                    userBookings.add(booking);
                 }
             }
         }

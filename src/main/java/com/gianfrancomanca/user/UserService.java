@@ -1,5 +1,6 @@
 package com.gianfrancomanca.user;
 
+import java.util.List;
 import java.util.UUID;
 
 public class UserService {
@@ -14,7 +15,7 @@ public class UserService {
         return userDao.getUserById(id).orElse(new User("Not Found", UUID.fromString("87dbde4e-b1f0-4561-8d07-53a31000be68")));
     }
 
-    public User[] getAllUsers() {
+    public List<User> getAllUsers() {
         return userDao.getUsers();
     }
 

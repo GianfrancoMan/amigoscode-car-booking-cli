@@ -1,5 +1,7 @@
 package com.gianfrancomanca.car;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class CarService {
@@ -10,7 +12,7 @@ public class CarService {
     }
 
     //get all cars
-    public Car[] getCars() {
+    public List<Car> getCars() {
         return carDao.getCars();
     }
 
@@ -20,27 +22,21 @@ public class CarService {
     }
 
     //Retrieve all unique car ids
-    public String [] retrieveCarIds() {
-        Car[] cars = getCars();
-        String[] ids = new String[cars.length];
-        for(int i=0; i<cars.length; i++) {
-            ids[i] = cars[i].getId().toString();
+    public List<String> retrieveCarIds() {
+        List<Car> cars = getCars();
+        List<String> ids = new ArrayList<>();
+        for(int i=0; i<cars.size(); i++) {
+            ids.add(cars.get(i).getId().toString());
         }
         return ids;
     }
 
     //Retrieve all electric car ids
-    public String[] retrieveECarsIds() {
-        int ie = 0;
-        for(int i=0; i<getCars().length; i++) {
-            if(getCars()[i].isElectric()) ie++;
-        }
-
-        String[] eIds = new String[ie];
-        int eIndex = 0;
-        for(int i=0; i<getCars().length; i++) {
-            if(getCars()[i].isElectric()) {
-                eIds[eIndex++] = getCars()[i].getId().toString();
+    public List<String> retrieveECarsIds() {
+        List<String> eIds = new ArrayList<>();
+        for(int i=0; i<getCars().size(); i++) {
+            if(getCars().get(i).isElectric()) {
+                eIds.add(getCars().get(i).getId().toString());
             }
         }
         return eIds;}

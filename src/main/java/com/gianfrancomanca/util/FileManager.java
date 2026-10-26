@@ -1,10 +1,15 @@
 package com.gianfrancomanca.util;
 
+import com.gianfrancomanca.booking.CarBookingDao;
+import com.gianfrancomanca.car.CarDao;
+import com.gianfrancomanca.user.UserDao;
+
 import java.io.*;
+import java.util.List;
 
 public class FileManager {
 
-    public static void writeToFile(Object[] objects, String filePath) {
+    public static <T> void writeToFile(List<T> objects, String filePath) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(objects);
         } catch (IOException e) {

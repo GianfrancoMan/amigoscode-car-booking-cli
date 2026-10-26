@@ -5,23 +5,23 @@ package com.gianfrancomanca.booking;
 import com.gianfrancomanca.util.FileManager;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public class CarBookingFileDataAccessService implements CarBookingDao{
-    private  int index;
-    private  CarBooking[] bookings;
+    private  List<CarBooking> bookings;
     private final String filePath;
 
     public CarBookingFileDataAccessService(String filePath) {
         this.filePath = filePath;
         this.initializeBookings();
-        index = bookings.length;
     }
 
     @Override
-    public CarBooking[] getBookings() {
-        bookings = (CarBooking[]) FileManager.readFromFile(filePath);
+    public List<CarBooking> getBookings() {
+        bookings = (List<CarBooking>) FileManager.readFromFile(filePath);
         setStatus();
         FileManager.writeToFile(bookings, filePath);
         return bookings;
@@ -29,24 +29,15 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
 
     @Override
     public void saveBooking(CarBooking booking) {
-        bookings = (CarBooking[]) FileManager.readFromFile(filePath);
-        index = bookings.length + 1;
-        CarBooking[] bookingsHelper = new CarBooking[index];
-        if(bookingsHelper.length == 1) bookingsHelper[0] = booking;
-        else {
-            for (int i = 0; i < bookings.length; i++) {
-                bookingsHelper[i] = bookings[i];
-            }
-            bookingsHelper[index-1] = booking;
-        }
-        bookings = bookingsHelper;
+        bookings = (List<CarBooking>) FileManager.readFromFile(filePath);
+        bookings.add(booking);
         setStatus();
         FileManager.writeToFile(bookings, filePath);
     }
 
     @Override
     public Optional<CarBooking> findBookingById(String id) {
-        bookings = (CarBooking[]) FileManager.readFromFile(filePath);
+        bookings = (List<CarBooking>) FileManager.readFromFile(filePath);
         setStatus();
         FileManager.writeToFile(bookings, filePath);
         for(CarBooking booking : bookings) {
@@ -57,7 +48,7 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
 
     @Override
     public boolean deleteBookingById(UUID id) {
-        bookings = (CarBooking[]) FileManager.readFromFile(filePath);
+        bookings = (List<CarBooking>) FileManager.readFromFile(filePath);
         for (CarBooking booking : bookings) {
             if (booking.getId().equals(id)
                     && booking.getStatus() != BookingStatus.ACTIVE
@@ -72,25 +63,14 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
     }
 
     @Override
-    public CarBooking[] getBookingsByUserId(String userId) {
-        bookings = (CarBooking[]) FileManager.readFromFile(filePath);
+    public List<CarBooking> getBookingsByUserId(String userId) {
+        bookings = (List<CarBooking>) FileManager.readFromFile(filePath);
         setStatus();
         FileManager.writeToFile(bookings, filePath);
-        CarBooking[] userBookings;
-        int bookingLength = 0;
-
-        for(CarBooking booking : bookings)
-            if(booking.getUserId().toString().equals(userId))
-                bookingLength++;
-
-        userBookings = new CarBooking[bookingLength];
-        int userBookingsIndex = 0;
-        if(userBookings.length > 0) {
-            for(CarBooking booking : bookings) {
-                if (booking.getUserId().toString().equals(userId)) {
-                    userBookings[userBookingsIndex] = booking;
-                    userBookingsIndex++;
-                }
+        List<CarBooking> userBookings = new ArrayList<>();
+        for(CarBooking booking : bookings) {
+            if (booking.getUserId().toString().equals(userId)) {
+                userBookings.add(booking);
             }
         }
         return userBookings;
@@ -115,9 +95,9 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
      * Initialize the bookings array if it is null and write it to the file.
      */
     private void initializeBookings() {
-        bookings = (CarBooking[]) FileManager.readFromFile(filePath);
+        bookings = (List<CarBooking>) FileManager.readFromFile(filePath);
         if(null == bookings) {
-            bookings = new CarBooking[0];
+            bookings = new ArrayList<>();
             FileManager.writeToFile(bookings, filePath);
         }
     }
