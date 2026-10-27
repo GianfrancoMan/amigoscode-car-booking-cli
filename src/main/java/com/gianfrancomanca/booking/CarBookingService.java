@@ -36,25 +36,18 @@ public class CarBookingService {
     //Get all cars that are not booked during the given dates
     public List<Car> getAvailableCars(LocalDate[] dates, List<Car> cars) {
         List<CarBooking> bookings = carBookingDao.getBookings();
-        List<String> carIds = new ArrayList<>();
-        for(CarBooking booking : bookings) {
-            if(isDateUnavailable(dates[0], dates[1], booking)) {
-                if(!carIds.contains(booking.getCarID()))
-                    carIds.add(booking.getCarID());
-            }
-        }
-        if(!carIds.isEmpty()) {
-            List<Car> availableCars = new ArrayList<>();
-            for(Car car : cars) {
-                for(String carId : carIds) {
-                    if(car.getId().toString().equals(carId)) {
-                        availableCars.add(car);
+        List<Car> availableCars = new ArrayList<>();
+        for (Car car : cars) availableCars.add(car);
+        for(Car car : cars) {
+            for(CarBooking booking : bookings) {
+                if(car.getId().toString().equals(booking.getCarID())) {
+                    if(isDateUnavailable(dates[0], dates[1], booking)) {
+                        availableCars.remove(car);
                     }
                 }
             }
-                return availableCars;
         }
-        return cars;
+        return availableCars;
     }
 
     //get all bookings
@@ -80,8 +73,8 @@ public class CarBookingService {
         long days = ChronoUnit.DAYS.between(startDate, endDate) +1;
         for(int i=0; i<days; i++) {
             LocalDate dateToCheck = startDate.plusDays(i);
-            if((booking.getStartDate().isEqual(dateToCheck) || booking.getEndDate().isEqual(dateToCheck)) ||
-                    (booking.getStartDate().isBefore(dateToCheck) && booking.getEndDate().isAfter(dateToCheck))) {
+            if((booking.getStartDate().isEqual(dateToCheck) || booking.getStartDate().isBefore(dateToCheck)) &&
+                    (booking.getEndDate().isEqual(dateToCheck) || booking.getEndDate().isAfter(dateToCheck))) {
                 return true;
             }
         }

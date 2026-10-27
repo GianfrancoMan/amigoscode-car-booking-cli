@@ -5,10 +5,7 @@ package com.gianfrancomanca.booking;
 import com.gianfrancomanca.util.FileManager;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class CarBookingFileDataAccessService implements CarBookingDao{
     private  List<CarBooking> bookings;
@@ -24,7 +21,7 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
         bookings = (List<CarBooking>) FileManager.readFromFile(filePath);
         setStatus();
         FileManager.writeToFile(bookings, filePath);
-        return bookings;
+        return (null == bookings) ? Collections.emptyList() : bookings;
     }
 
     @Override
@@ -73,7 +70,7 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
                 userBookings.add(booking);
             }
         }
-        return userBookings;
+        return (null == userBookings) ? Collections.emptyList() : userBookings;
     }
 
     //set the status of the bookings

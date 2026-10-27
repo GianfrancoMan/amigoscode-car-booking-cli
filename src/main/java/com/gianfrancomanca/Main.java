@@ -75,7 +75,7 @@ public class Main {
         }
 
         List<Car> availableCars = carBookingService.getAvailableCars(serviceDates.get(), carService.getCars());
-        if(availableCars.size() == 0) {
+        if(availableCars.isEmpty()) {
             printSentence("No cars available for the selected period");
             return false;
         }
@@ -102,7 +102,7 @@ public class Main {
     //user choice to see all the bookings
     private boolean manageAllBookingView() {
         List<CarBooking> bookings = carBookingService.getAllBookings();
-        if(null != bookings && bookings.size() >= 0) {
+        if(!bookings.isEmpty()) {
             List<String> data = new ArrayList<>();
             int i= 1;
             for(CarBooking booking : bookings){
@@ -157,7 +157,7 @@ public class Main {
         }
         if(!userInput.equalsIgnoreCase("cancel"))  {
             List<CarBooking> userBookings = carBookingService.getBookingsByUser(userInput);
-            if(null != userBookings && userBookings.size() != 0) {
+            if(!userBookings.isEmpty()) {
                 String customerName =
                         userService.getUserById(userInput).getName().equalsIgnoreCase("not found") ? "customer" : userService.getUserById(userInput).getName();
                 printSentence("\nBookings made by "+ customerName + "...");
@@ -208,7 +208,7 @@ public class Main {
     private boolean manageAllUserView() {
         List<User> users = userService.getAllUsers();
         List<String> userData = new ArrayList<>();
-        if(users.size() > 0) {
+        if(!users.isEmpty()) {
             printHeader(
                     "\n-----------------------------------------------"
                             + "\nRENTAL CAR  -> CUSTOMER LIST\n"
@@ -393,7 +393,7 @@ public class Main {
     }
 
     public void printArray(List<String> data) {
-        if(data.size() == 0) {
+        if(data.isEmpty()) {
             System.out.println("Nothing to display.\n");
         }
         else {
@@ -405,7 +405,7 @@ public class Main {
     public void printAllBookings(List<String> bookingsData) {
         System.out.println("                Rental Car Bookings List:");
         System.out.println("-----------------------------------------------------------");
-        if(bookingsData.size() == 0) {
+        if(bookingsData.isEmpty()) {
             System.out.println("No bookings found");
             System.out.println("-----------------------------------------------------------");
             return;

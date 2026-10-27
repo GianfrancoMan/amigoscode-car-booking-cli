@@ -1,10 +1,7 @@
 package com.gianfrancomanca.car;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class CarArrayDataSourceService implements CarDao {
     public static List<Car> cars = new ArrayList<>();
@@ -21,7 +18,7 @@ public class CarArrayDataSourceService implements CarDao {
 
     //get all cars
     public List<Car> getCars() {
-        return cars;
+        return (null == cars) ? Collections.emptyList() : cars;
     }
 
     //retrieve a car by id

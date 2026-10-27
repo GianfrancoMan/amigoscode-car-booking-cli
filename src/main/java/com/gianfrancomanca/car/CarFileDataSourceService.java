@@ -4,10 +4,7 @@ import com.gianfrancomanca.util.FileManager;
 
 import java.io.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class CarFileDataSourceService implements CarDao {
     private final  List<Car> cars;
@@ -21,7 +18,7 @@ public class CarFileDataSourceService implements CarDao {
 
     @Override
     public List<Car> getCars() {
-        return cars;
+        return (null == cars) ? Collections.emptyList() : cars;
     }
 
     @Override

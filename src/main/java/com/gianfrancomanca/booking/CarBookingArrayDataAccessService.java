@@ -1,10 +1,7 @@
 package com.gianfrancomanca.booking;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class CarBookingArrayDataAccessService  implements CarBookingDao {
 
@@ -20,7 +17,7 @@ public class CarBookingArrayDataAccessService  implements CarBookingDao {
     @Override
     public List<CarBooking> getBookings() {
         setStatus();
-        return bookings;
+        return (bookings ==null)  ? Collections.emptyList() : bookings;
     }
 
     @Override
@@ -56,17 +53,16 @@ public class CarBookingArrayDataAccessService  implements CarBookingDao {
     public List<CarBooking> getBookingsByUserId(String userId) {
         setStatus();
         List<CarBooking> userBookings;
-        int bookingLength = 0;
 
         userBookings = new ArrayList<>();
-        if(userBookings.size() > 0) {
+        if(!userBookings.isEmpty()) {
             for(CarBooking booking : bookings) {
                 if (booking.getUserId().toString().equals(userId)) {
                     userBookings.add(booking);
                 }
             }
         }
-        return userBookings;
+        return (userBookings == null) ? Collections.emptyList() : userBookings;
     }
 
     //set the status of the bookings

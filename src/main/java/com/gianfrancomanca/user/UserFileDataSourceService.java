@@ -20,7 +20,7 @@ public class UserFileDataSourceService implements UserDao {
 
     @Override
     public List<User> getUsers() {
-        return users;
+        return null == users ? Collections.emptyList() : users;
     }
 
     @Override
