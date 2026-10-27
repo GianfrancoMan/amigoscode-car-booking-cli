@@ -122,7 +122,7 @@ public class Main {
             printAllBookings(data);
             return true;
         }
-        printError("Something was wrong, please try again later");
+        printError("There are no bookings to display, please try again later or contact the support team if the problem persists.");
         return false;
     }
 
