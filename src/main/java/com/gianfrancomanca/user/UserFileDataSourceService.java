@@ -14,7 +14,6 @@ public class UserFileDataSourceService implements UserDao {
     public UserFileDataSourceService(String filePath) {
         this.filePath = filePath;
         users = (List<User>) FileManager.readFromFile(filePath);
-        System.out.println(users); //TODO remember to cancel it when project is completed
     }
 
 

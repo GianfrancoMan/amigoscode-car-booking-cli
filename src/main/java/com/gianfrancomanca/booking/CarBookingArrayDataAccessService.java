@@ -55,14 +55,12 @@ public class CarBookingArrayDataAccessService  implements CarBookingDao {
         List<CarBooking> userBookings;
 
         userBookings = new ArrayList<>();
-        if(!userBookings.isEmpty()) {
             for(CarBooking booking : bookings) {
                 if (booking.getUserId().toString().equals(userId)) {
                     userBookings.add(booking);
                 }
             }
-        }
-        return (userBookings == null) ? Collections.emptyList() : userBookings;
+        return userBookings;
     }
 
     //set the status of the bookings

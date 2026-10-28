@@ -70,7 +70,7 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
                 userBookings.add(booking);
             }
         }
-        return (null == userBookings) ? Collections.emptyList() : userBookings;
+        return userBookings;
     }
 
     //set the status of the bookings
