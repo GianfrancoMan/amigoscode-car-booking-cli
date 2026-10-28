@@ -8,6 +8,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,39 +34,24 @@ public class CarBookingService {
     }
 
     //Get all cars that are not booked during the given dates
-    public Car[] getAvailableCars(LocalDate[] dates, Car[] cars) {
-        CarBooking[] bookings = carBookingDao.getBookings();
-        StringBuilder carIdsString = new StringBuilder();
-        for(int i=0; i<bookings.length; i++) {
-            if(isDateUnavailable(dates[0], dates[1], bookings[i])) {
-                if(!carIdsString.toString().contains(bookings[i].getCarID()))
-                    carIdsString.append(bookings[i].getCarID()).append(",");
-            }
-        }
-        if(!carIdsString.isEmpty()) {
-            carIdsString = new StringBuilder(carIdsString.substring(0, carIdsString.length() - 1));
-            String[] carIds = carIdsString.toString().split(",");
-            Car[] availableCars = new Car[cars.length - carIds.length];
-            int availableIndex = 0;
-            for(int i=0; i<cars.length; i++) {
-                int indexFound = -1;
-                for(int index=0; index<carIds.length; index++) {
-                    if(cars[i].getId().toString().equals(carIds[index])) {
-                        indexFound = index;
+    public List<Car> getAvailableCars(LocalDate[] dates, List<Car> cars) {
+        List<CarBooking> bookings = carBookingDao.getBookings();
+        List<Car> availableCars = new ArrayList<>();
+        for (Car car : cars) availableCars.add(car);
+        for(Car car : cars) {
+            for(CarBooking booking : bookings) {
+                if(car.getId().toString().equals(booking.getCarID())) {
+                    if(isDateUnavailable(dates[0], dates[1], booking)) {
+                        availableCars.remove(car);
                     }
                 }
-                if (indexFound == -1) {
-                    availableCars[availableIndex] = cars[i];
-                    availableIndex++;
-                }
             }
-                return availableCars;
         }
-        return cars;
+        return availableCars;
     }
 
     //get all bookings
-    public CarBooking[] getAllBookings() {
+    public List<CarBooking> getAllBookings() {
         return carBookingDao.getBookings();
     }
 
@@ -86,8 +73,8 @@ public class CarBookingService {
         long days = ChronoUnit.DAYS.between(startDate, endDate) +1;
         for(int i=0; i<days; i++) {
             LocalDate dateToCheck = startDate.plusDays(i);
-            if((booking.getStartDate().isEqual(dateToCheck) || booking.getEndDate().isEqual(dateToCheck)) ||
-                    (booking.getStartDate().isBefore(dateToCheck) && booking.getEndDate().isAfter(dateToCheck))) {
+            if((booking.getStartDate().isEqual(dateToCheck) || booking.getStartDate().isBefore(dateToCheck)) &&
+                    (booking.getEndDate().isEqual(dateToCheck) || booking.getEndDate().isAfter(dateToCheck))) {
                 return true;
             }
         }
@@ -95,7 +82,7 @@ public class CarBookingService {
     }
 
     //Asks CarBookingDao for booking by user id
-    public CarBooking[] getBookingsByUser(String userId) {
+    public List<CarBooking> getBookingsByUser(String userId) {
         return carBookingDao.getBookingsByUserId(userId);
     }
 

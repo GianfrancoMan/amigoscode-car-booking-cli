@@ -7,9 +7,7 @@ import com.gianfrancomanca.user.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Optional;
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
 
 public class Main {
 
@@ -76,8 +74,8 @@ public class Main {
             return false;
         }
 
-        Car[] availableCars = carBookingService.getAvailableCars(serviceDates.get(), carService.getCars());
-        if(availableCars.length == 0) {
+        List<Car> availableCars = carBookingService.getAvailableCars(serviceDates.get(), carService.getCars());
+        if(availableCars.isEmpty()) {
             printSentence("No cars available for the selected period");
             return false;
         }
@@ -103,26 +101,28 @@ public class Main {
 
     //user choice to see all the bookings
     private boolean manageAllBookingView() {
-        CarBooking[] bookings = carBookingService.getAllBookings();
-        if(null != bookings && bookings.length >= 0) {
-            String data[] = new String[bookings.length];
-            for(int i=0; i<bookings.length; i++){
-                Car car = carService.getCarById(bookings[i].getCarID()).orElse(null);
+        List<CarBooking> bookings = carBookingService.getAllBookings();
+        if(!bookings.isEmpty()) {
+            List<String> data = new ArrayList<>();
+            int i= 1;
+            for(CarBooking booking : bookings){
+                Car car = carService.getCarById(booking.getCarID()).orElse(null);
                 if(null == car) {
-                    data[i] = "Not Found";
+                    data.add("Not Found");
                 }
                 else {
-                    data[i] = "\n(" + (i+1) + ")\nBOOKING date: " + parseDateForView(bookings[i].getBookingDate()) + "\t\t id: " + bookings[i].getId().toString()
-                            + "\nCUSTOMER\t\tname: " + userService.getUserById(bookings[i].getUserId()).getName() + "\t\tid: " + bookings[i].getUserId()
+                    data.add("\n(" + i + ")\nBOOKING date: " + parseDateForView(booking.getBookingDate()) + "\t\t id: " + booking.getId().toString()
+                            + "\nCUSTOMER\t\tname: " + userService.getUserById(booking.getUserId()).getName() + "\t\tid: " + booking.getUserId()
                             +"\nCAR\t\t model: "  + car.getBrand().getName() + " " + car.getName() + "\t\tregistration number: " + car.getRegistrationNumber()
-                            +"\nBOOKING PERIOD\t\tstart: " + parseDateForView(bookings[i].getStartDate()) + "\t\tend:  " + parseDateForView(bookings[i].getEndDate())
-                            +"\nSTATUS: " + bookings[i].getStatus().getStatusName();
+                            +"\nBOOKING PERIOD\t\tstart: " + parseDateForView(booking.getStartDate()) + "\t\tend:  " + parseDateForView(booking.getEndDate())
+                            +"\nSTATUS: " + booking.getStatus().getStatusName());
                 }
+                i++;
             }
             printAllBookings(data);
             return true;
         }
-        printError("Something was wrong, please try again later");
+        printError("There are no bookings to display.");
         return false;
     }
 
@@ -156,24 +156,25 @@ public class Main {
             userInput = scanner.nextLine();
         }
         if(!userInput.equalsIgnoreCase("cancel"))  {
-            CarBooking[] userBookings = carBookingService.getBookingsByUser(userInput);
-            if(null != userBookings && userBookings.length != 0) {
+            List<CarBooking> userBookings = carBookingService.getBookingsByUser(userInput);
+            if(!userBookings.isEmpty()) {
                 String customerName =
                         userService.getUserById(userInput).getName().equalsIgnoreCase("not found") ? "customer" : userService.getUserById(userInput).getName();
                 printSentence("\nBookings made by "+ customerName + "...");
-                var data = new String[userBookings.length];
-                for(int i=0; i<userBookings.length; i++) {
-                    Car car = carService.getCarById(userBookings[i].getCarID()).orElse(null);
+                var data = new ArrayList<String>();
+                int i = 1;
+                for(CarBooking userBooking : userBookings) {
+                    Car car = carService.getCarById(userBooking.getCarID()).orElse(null);
                     if(null == car) {
-                        data[i] = "Not Found";
+                        data.add("Not Found");
                     }
                     else {
-                        data[i] = "\n(" + (i+1) + ")\nBOOKING date: " + parseDateForView(userBookings[i].getBookingDate()) + "\t\t id: " + userBookings[i].getId().toString()
+                        data.add("\n(" + (i) + ")\nBOOKING date: " + parseDateForView(userBooking.getBookingDate()) + "\t\t id: " + userBooking.getId().toString()
                                 + "\nCAR\t\t model: " + car.getBrand().getName() + " " + car.getName() + "\t\tregistration number: " + car.getRegistrationNumber()
-                                +"\nBOOKING PERIOD\t\tstart: " + parseDateForView(userBookings[i].getStartDate()) + "\t\tend:  " + parseDateForView(userBookings[i].getEndDate())
-                                +"\nSTATUS: " + userBookings[i].getStatus().getStatusName();
+                                +"\nBOOKING PERIOD\t\tstart: " + parseDateForView(userBooking.getStartDate()) + "\t\tend:  " + parseDateForView(userBooking.getEndDate())
+                                +"\nSTATUS: " + userBooking.getStatus().getStatusName());
                     }
-
+                    i++;
                 }
                 printAllBookings(data);
                 return true;
@@ -205,9 +206,9 @@ public class Main {
     }
 
     private boolean manageAllUserView() {
-        User[] users = userService.getAllUsers();
-        String[] userData = new String[users.length];
-        if(users.length > 0) {
+        List<User> users = userService.getAllUsers();
+        List<String> userData = new ArrayList<>();
+        if(!users.isEmpty()) {
             printHeader(
                     "\n-----------------------------------------------"
                             + "\nRENTAL CAR  -> CUSTOMER LIST\n"
@@ -241,17 +242,17 @@ public class Main {
     }
 
     //manage the user's choice from the car menu
-    private String manageCarChoice(int choice, Car[] cars) {
-        for (int i=0; i<cars.length; i++) {
-            if(choice == (i+1)) return cars[i].getId().toString();
+    private String manageCarChoice(int choice, List<Car> cars) {
+        for (int i=0; i<cars.size(); i++) {
+            if(choice == (i+1)) return cars.get(i).getId().toString();
         }
         return "";
     }
 
     //create the user data array
-    private String[] createUserData(User [] users, String[] userData) {
-        for(int i=0; i<users.length; i++) {
-            userData[i] =String.format(" (%d)  Name: %-50s ID: %-50s", (i+1), users[i].getName(), users[i].getId().toString());
+    private List<String> createUserData(List<User> users, List<String> userData) {
+        for(int i=0; i<users.size(); i++) {
+            userData.add(String.format(" (%d)  Name: %-50s ID: %-50s", (i+1), users.get(i).getName(), users.get(i).getId().toString()));
         }
         return userData;
     }
@@ -307,8 +308,8 @@ public class Main {
         return date;
     }
 
-    private String validateChosenCar(Scanner scanner, Car[] availableCars) {
-        int max = availableCars.length + 1;
+    private String validateChosenCar(Scanner scanner, List<Car> availableCars) {
+        int max = availableCars.size() + 1;
         int choice =0; String  carId = "";
         while (choice != max && carId.isEmpty()) {
             printHeader("\n\n           CARS AVAILABLE FOR THE SELECTED PERIOD   \n------------------------------------------------------------------");
@@ -362,7 +363,7 @@ public class Main {
     }
 
     //print the Car Menu
-    public void carMenu(Car[] cars) {
+    public void carMenu(List<Car> cars) {
         int i = 1;
         for (Car car : cars) {
             System.out.println(
@@ -372,7 +373,7 @@ public class Main {
                             + " - Price: " + car.getRentalPrice() + "€ (per day)"
             );
             ++i;
-        }            System.out.println("    Type " + (cars.length +1)+ " to Cancel");
+        }            System.out.println("    Type " + (cars.size() +1)+ " to Cancel");
         System.out.println("---------------------------------------------------------------");
     }
 
@@ -391,8 +392,8 @@ public class Main {
         System.out.println("-----------------------------------------------------------\n");
     }
 
-    public void printArray(String[] data) {
-        if(data.length == 0) {
+    public void printArray(List<String> data) {
+        if(data.isEmpty()) {
             System.out.println("Nothing to display.\n");
         }
         else {
@@ -401,10 +402,10 @@ public class Main {
         System.out.println("\n");
     }
 
-    public void printAllBookings(String[] bookingsData) {
+    public void printAllBookings(List<String> bookingsData) {
         System.out.println("                Rental Car Bookings List:");
         System.out.println("-----------------------------------------------------------");
-        if(bookingsData.length == 0) {
+        if(bookingsData.isEmpty()) {
             System.out.println("No bookings found");
             System.out.println("-----------------------------------------------------------");
             return;
@@ -428,22 +429,22 @@ public class Main {
     }
 
     //get all cars availabilities
-    private String[] getCarsAvailabilities() {
-        String[] carIds  = carService.retrieveCarIds();
-        String[] availabilities = new String[carIds.length];
-        for(int i=0; i<carIds.length; i++) {
-            availabilities[i] = "("+ (i + 1) + ")" +createAvailabilities(carIds[i]);
+    private List<String> getCarsAvailabilities() {
+        List<String> carIds  = carService.retrieveCarIds();
+        List<String> availabilities = new ArrayList<>();
+        for(int i=0; i<carIds.size(); i++) {
+            availabilities.add("("+ (i + 1) + ")" +createAvailabilities(carIds.get(i)));
         }
 
         return availabilities;
     }
 
     //get all electric cars availabilities
-    private String[] getElectricCarsAvailabilities() {
-        String[] eIds = carService.retrieveECarsIds();
-        String[] availabilities = new String[eIds.length];
-        for(int i=0; i<eIds.length; i++) {
-            availabilities[i] = "("+ (i + 1) + ")" +createAvailabilities(eIds[i]);
+    private List<String> getElectricCarsAvailabilities() {
+        List<String> eIds = carService.retrieveECarsIds();
+        List<String> availabilities = new ArrayList<>();
+        for(int i=0; i<eIds.size(); i++) {
+            availabilities.add("("+ (i + 1) + ")" +createAvailabilities(eIds.get(i)));
         }
 
         return availabilities;
@@ -454,7 +455,7 @@ public class Main {
         String checkedIds = "";
         String availability = "";
         String partialAvailability = "";
-        CarBooking[] bookings = carBookingService.getAllBookings();
+        List<CarBooking> bookings = carBookingService.getAllBookings();
 
         Car car = carService.getCarById(carId).orElse(null);
 

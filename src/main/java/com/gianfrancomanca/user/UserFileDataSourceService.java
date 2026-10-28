@@ -1,23 +1,22 @@
 package com.gianfrancomanca.user;
 
 import com.gianfrancomanca.util.FileManager;
-import java.util.Arrays;
-import java.util.Optional;
+
+import java.util.*;
 
 public class UserFileDataSourceService implements UserDao {
-    private final User[] users;
+    private final List<User> users;
     private final String filePath;
 
     public UserFileDataSourceService(String filePath) {
         this.filePath = filePath;
-        users = (User[]) FileManager.readFromFile(filePath);
-        System.out.println(Arrays.toString(users));
+        users = (List<User>) FileManager.readFromFile(filePath);
     }
 
 
     @Override
-    public User[] getUsers() {
-        return users;
+    public List<User> getUsers() {
+        return null == users ? Collections.emptyList() : users;
     }
 
     @Override

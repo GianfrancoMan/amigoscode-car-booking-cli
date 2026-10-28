@@ -1,14 +1,15 @@
 package com.gianfrancomanca.booking;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface CarBookingDao {
 
-    CarBooking[] getBookings();
+    List<CarBooking> getBookings();
     void saveBooking(CarBooking booking);
     Optional<CarBooking> findBookingById(String id);
     boolean deleteBookingById(UUID id);
-    CarBooking[] getBookingsByUserId(String userId);
+    List<CarBooking> getBookingsByUserId(String userId);
 
 }

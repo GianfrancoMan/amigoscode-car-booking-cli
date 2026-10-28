@@ -3,21 +3,21 @@ package com.gianfrancomanca.car;
 import com.gianfrancomanca.util.FileManager;
 
 import java.io.*;
-import java.util.Optional;
+import java.util.*;
 
 public class CarFileDataSourceService implements CarDao {
-    private final  Car[] cars;
+    private final  List<Car> cars;
     private final String filePath;
 
     public CarFileDataSourceService(String filePath) {
         this.filePath = filePath;
-        cars = (Car[])FileManager.readFromFile(filePath);
+        cars = (List<Car>)FileManager.readFromFile(filePath);
     }
 
 
     @Override
-    public Car[] getCars() {
-        return cars;
+    public List<Car> getCars() {
+        return (null == cars) ? Collections.emptyList() : cars;
     }
 
     @Override
@@ -27,5 +27,4 @@ public class CarFileDataSourceService implements CarDao {
         }
         return Optional.empty();
     }
-
 }
