@@ -2,9 +2,6 @@ package com.gianfrancomanca.user;
 
 import com.gianfrancomanca.util.FileManager;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.*;
 
 public class UserFileDataSourceService implements UserDao {
