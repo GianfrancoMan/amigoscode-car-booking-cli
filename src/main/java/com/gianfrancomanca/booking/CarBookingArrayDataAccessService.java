@@ -1,7 +1,10 @@
 package com.gianfrancomanca.booking;
 
+import com.gianfrancomanca.util.FileManager;
+
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CarBookingArrayDataAccessService  implements CarBookingDao {
 
@@ -37,14 +40,11 @@ public class CarBookingArrayDataAccessService  implements CarBookingDao {
 
     @Override
     public boolean deleteBookingById(UUID id) {
-        for (CarBooking booking : bookings) {
-            if (booking.getId().equals(id)
-                    && booking.getStatus() != BookingStatus.ACTIVE
-                    && booking.getStatus() != BookingStatus.COMPLETED
-                    && booking.getStatus() != BookingStatus.CANCELED) {
-                booking.setStatus(BookingStatus.CANCELED);
-                return true;
-            }
+        var bookingId = bookings.stream().filter(booking -> booking.getId().equals(id)).findFirst().orElse(null);
+        if (null != bookingId && bookingId.getStatus() != BookingStatus.ACTIVE
+                && bookingId.getStatus() != BookingStatus.COMPLETED && bookingId.getStatus() != BookingStatus.CANCELED) {
+            bookingId.setStatus(BookingStatus.CANCELED);
+            return true;
         }
         return false;
     }
@@ -52,30 +52,25 @@ public class CarBookingArrayDataAccessService  implements CarBookingDao {
     @Override
     public List<CarBooking> getBookingsByUserId(String userId) {
         setStatus();
-        List<CarBooking> userBookings;
-
-        userBookings = new ArrayList<>();
-            for(CarBooking booking : bookings) {
-                if (booking.getUserId().toString().equals(userId)) {
-                    userBookings.add(booking);
-                }
-            }
-        return userBookings;
+        return bookings.stream().filter(booking -> booking.getUserId().toString().equals(userId))
+                .collect(Collectors.toList());
     }
 
     //set the status of the bookings
     private void setStatus() {
-        for (CarBooking booking : bookings) {
-            LocalDate today = LocalDate.now();
-            if (booking.getStatus() != BookingStatus.CANCELED) {
-                if ((booking.getStartDate().isEqual(today) || booking.getEndDate().isEqual(today)) ||
-                        (booking.getStartDate().isBefore(today) && booking.getEndDate().isAfter(today))) {
-                    booking.setStatus(BookingStatus.ACTIVE);
-                } else if (today.isAfter(booking.getEndDate())) {
-                    booking.setStatus(BookingStatus.COMPLETED);
-                } else  booking.setStatus(BookingStatus.BOOKED);
-            }
-        }
+        bookings.stream().peek(
+                booking -> {
+                    LocalDate today = LocalDate.now();
+                    if (booking.getStatus() != BookingStatus.CANCELED) {
+                        if ((booking.getStartDate().isEqual(today) || booking.getEndDate().isEqual(today)) ||
+                                (booking.getStartDate().isBefore(today) && booking.getEndDate().isAfter(today))) {
+                            booking.setStatus(BookingStatus.ACTIVE);
+                        } else if (today.isAfter(booking.getEndDate())) {
+                            booking.setStatus(BookingStatus.COMPLETED);
+                        } else  booking.setStatus(BookingStatus.BOOKED);
+                    }
+                }
+        );
     }
 
 }//end

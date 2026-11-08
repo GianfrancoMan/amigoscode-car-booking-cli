@@ -8,10 +8,10 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class CarBookingService {
 
@@ -36,17 +36,10 @@ public class CarBookingService {
     //Get all cars that are not booked during the given dates
     public List<Car> getAvailableCars(LocalDate[] dates, List<Car> cars) {
         List<CarBooking> bookings = carBookingDao.getBookings();
-        List<Car> availableCars = new ArrayList<>();
-        for (Car car : cars) availableCars.add(car);
-        for(Car car : cars) {
-            for(CarBooking booking : bookings) {
-                if(car.getId().toString().equals(booking.getCarID())) {
-                    if(isDateUnavailable(dates[0], dates[1], booking)) {
-                        availableCars.remove(car);
-                    }
-                }
-            }
-        }
+        List<Car> availableCars = cars.stream().filter(
+                        car -> bookings.stream().noneMatch(booking -> booking.getCarID().equals(car.getId().toString()) &&
+                                isDateUnavailable(dates[0], dates[1], booking)))
+                .collect(Collectors.toList());
         return availableCars;
     }
 
@@ -62,7 +55,11 @@ public class CarBookingService {
 
     //cancel a booking
     public boolean cancelBooking(String id) {
-        return carBookingDao.deleteBookingById(UUID.fromString(id));
+        try {
+            return carBookingDao.deleteBookingById(UUID.fromString(id));
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     //check if the given dates are unavailable based on the booking requirement
@@ -71,6 +68,7 @@ public class CarBookingService {
             return false;
         }
         long days = ChronoUnit.DAYS.between(startDate, endDate) +1;
+        //in this loop there are no collections involved, so no changes needed for it.
         for(int i=0; i<days; i++) {
             LocalDate dateToCheck = startDate.plusDays(i);
             if((booking.getStartDate().isEqual(dateToCheck) || booking.getStartDate().isBefore(dateToCheck)) &&

@@ -22,9 +22,7 @@ public class CarFileDataSourceService implements CarDao {
 
     @Override
     public Optional<Car> getCarById(String id) {
-        for(Car car : cars) {
-            if(car.getId().toString().equals(id)) return Optional.of(car);
-        }
-        return Optional.empty();
+        Car resultingCar = cars.stream().filter(car -> car.getId().toString().equals(id)).findFirst().orElse(null);
+        return null == resultingCar ? Optional.empty() : Optional.of(resultingCar);
     }
 }
