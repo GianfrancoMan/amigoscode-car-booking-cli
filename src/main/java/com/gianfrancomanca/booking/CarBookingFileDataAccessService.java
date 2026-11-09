@@ -36,7 +36,7 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
     public Optional<CarBooking> findBookingById(String id) {
         bookings = (List<CarBooking>) FileManager.readFromFile(filePath);
         if(null != bookings) setStatus();
-        return bookings.stream().filter(booking -> booking.getId().equals(id)).findFirst()
+        return bookings.stream().filter(booking -> booking.getId().toString().equals(id)).findFirst()
                 .map(booking -> Optional.of(booking).orElse(null));
     }
 

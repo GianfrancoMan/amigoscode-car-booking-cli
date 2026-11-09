@@ -33,7 +33,7 @@ public class CarBookingArrayDataAccessService  implements CarBookingDao {
     public Optional<CarBooking> findBookingById(String id) {
         setStatus();
         for(CarBooking booking : bookings) {
-            if(booking.getId().equals(id)) return Optional.of(booking);
+            if(booking.getId().toString().equals(id)) return Optional.of(booking);
         }
         return Optional.ofNullable(null);
     }
