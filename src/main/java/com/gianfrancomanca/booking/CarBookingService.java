@@ -57,7 +57,7 @@ public class CarBookingService {
     public boolean cancelBooking(String id) {
         try {
             return carBookingDao.deleteBookingById(UUID.fromString(id));
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             return false;
         }
     }
