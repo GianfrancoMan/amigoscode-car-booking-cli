@@ -413,6 +413,7 @@ public class Main {
         int index = 1;
         for(String bookingData : bookingsData) {
             System.out.println("\n(" + index + ")\t" + bookingData);
+            ++index;
         }
         System.out.println("-----------------------------------------------------------");
     }
