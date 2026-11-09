@@ -58,7 +58,7 @@ public class CarBookingArrayDataAccessService  implements CarBookingDao {
 
     //set the status of the bookings
     private void setStatus() {
-        bookings.stream().peek(
+        bookings.forEach(
                 booking -> {
                     LocalDate today = LocalDate.now();
                     if (booking.getStatus() != BookingStatus.CANCELED) {

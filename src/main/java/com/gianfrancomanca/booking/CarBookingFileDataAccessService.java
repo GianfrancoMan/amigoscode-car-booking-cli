@@ -21,7 +21,7 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
     @Override
     public List<CarBooking> getBookings() {
         bookings = (List<CarBooking>) FileManager.readFromFile(filePath);
-        if(null != bookings)  bookings = setStatus();
+        if(null != bookings)  setStatus();
         return (null == bookings) ? Collections.emptyList() : bookings;
     }
 
@@ -29,13 +29,13 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
     public void saveBooking(CarBooking booking) {
         bookings = (List<CarBooking>) FileManager.readFromFile(filePath);
         bookings.add(booking);
-        bookings = setStatus();
+        setStatus();
     }
 
     @Override
     public Optional<CarBooking> findBookingById(String id) {
         bookings = (List<CarBooking>) FileManager.readFromFile(filePath);
-        if(null != bookings) bookings = setStatus();
+        if(null != bookings) setStatus();
         return bookings.stream().filter(booking -> booking.getId().equals(id)).findFirst()
                 .map(booking -> Optional.of(booking).orElse(null));
     }
@@ -56,15 +56,15 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
     @Override
     public List<CarBooking> getBookingsByUserId(String userId) {
         bookings = (List<CarBooking>) FileManager.readFromFile(filePath);
-        if(null != bookings) bookings = setStatus();
+        if(null != bookings)  setStatus();
 
         return bookings.stream().filter(booking -> booking.getUserId().toString().equals(userId))
                 .collect(Collectors.toList());
     }
 
     //set the status of the bookings
-    private List<CarBooking> setStatus() {
-        List<CarBooking> peekBookings = bookings.stream().peek(
+    private void setStatus() {
+        bookings.forEach(
                 booking -> {
                     LocalDate today = LocalDate.now();
                     if (booking.getStatus() != BookingStatus.CANCELED && booking.getStatus() != BookingStatus.COMPLETED) {
@@ -76,9 +76,8 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
                         } else booking.setStatus(BookingStatus.BOOKED);
                     }
                 }
-        ).collect(Collectors.toList());
-        FileManager.writeToFile(peekBookings, filePath);
-        return peekBookings;
+        );
+        FileManager.writeToFile(bookings, filePath);
     }
 
     /*
