@@ -21,9 +21,7 @@ public class UserArrayDataSourceService implements UserDao {
 
     @Override
     public Optional<User> getUserById(String id) {
-        for(User user : getUsers()) {
-            if(user.getId().toString().equals(id)) return Optional.of(user);
-        }
-        return Optional.ofNullable(null);
+        User resultingUser = users.stream().filter(user -> user.getId().toString().equals(id)).findFirst().orElse(null);
+        return null == resultingUser ? Optional.empty() : Optional.of(resultingUser);
     }
 }

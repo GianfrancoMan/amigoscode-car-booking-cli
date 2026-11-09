@@ -6,6 +6,8 @@ import com.gianfrancomanca.util.FileManager;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CarBookingFileDataAccessService implements CarBookingDao{
     private  List<CarBooking> bookings;
@@ -19,8 +21,7 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
     @Override
     public List<CarBooking> getBookings() {
         bookings = (List<CarBooking>) FileManager.readFromFile(filePath);
-        setStatus();
-        FileManager.writeToFile(bookings, filePath);
+        if(null != bookings)  setStatus();
         return (null == bookings) ? Collections.emptyList() : bookings;
     }
 
@@ -29,32 +30,25 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
         bookings = (List<CarBooking>) FileManager.readFromFile(filePath);
         bookings.add(booking);
         setStatus();
-        FileManager.writeToFile(bookings, filePath);
     }
 
     @Override
     public Optional<CarBooking> findBookingById(String id) {
         bookings = (List<CarBooking>) FileManager.readFromFile(filePath);
-        setStatus();
-        FileManager.writeToFile(bookings, filePath);
-        for(CarBooking booking : bookings) {
-            if(booking.getId().equals(id)) return Optional.of(booking);
-        }
-        return Optional.ofNullable(null);
+        if(null != bookings) setStatus();
+        return bookings.stream().filter(booking -> booking.getId().toString().equals(id)).findFirst()
+                .map(booking -> Optional.of(booking).orElse(null));
     }
 
     @Override
     public boolean deleteBookingById(UUID id) {
         bookings = (List<CarBooking>) FileManager.readFromFile(filePath);
-        for (CarBooking booking : bookings) {
-            if (booking.getId().equals(id)
-                    && booking.getStatus() != BookingStatus.ACTIVE
-                    && booking.getStatus() != BookingStatus.COMPLETED
-                    && booking.getStatus() != BookingStatus.CANCELED) {
-                booking.setStatus(BookingStatus.CANCELED);
-                FileManager.writeToFile(bookings, filePath);
-                return true;
-            }
+        var bookingId = bookings.stream().filter(booking -> booking.getId().equals(id)).findFirst().orElse(null);
+        if (null != bookingId && bookingId.getStatus() != BookingStatus.ACTIVE
+                && bookingId.getStatus() != BookingStatus.COMPLETED && bookingId.getStatus() != BookingStatus.CANCELED) {
+            bookingId.setStatus(BookingStatus.CANCELED);
+            FileManager.writeToFile(bookings, filePath);
+            return true;
         }
         return false;
     }
@@ -62,30 +56,28 @@ public class CarBookingFileDataAccessService implements CarBookingDao{
     @Override
     public List<CarBooking> getBookingsByUserId(String userId) {
         bookings = (List<CarBooking>) FileManager.readFromFile(filePath);
-        setStatus();
-        FileManager.writeToFile(bookings, filePath);
-        List<CarBooking> userBookings = new ArrayList<>();
-        for(CarBooking booking : bookings) {
-            if (booking.getUserId().toString().equals(userId)) {
-                userBookings.add(booking);
-            }
-        }
-        return userBookings;
+        if(null != bookings)  setStatus();
+
+        return bookings.stream().filter(booking -> booking.getUserId().toString().equals(userId))
+                .collect(Collectors.toList());
     }
 
     //set the status of the bookings
     private void setStatus() {
-        for (CarBooking booking : bookings) {
-            LocalDate today = LocalDate.now();
-            if (booking.getStatus() != BookingStatus.CANCELED) {
-                if ((booking.getStartDate().isEqual(today) || booking.getEndDate().isEqual(today)) ||
-                        (booking.getStartDate().isBefore(today) && booking.getEndDate().isAfter(today))) {
-                    booking.setStatus(BookingStatus.ACTIVE);
-                } else if (today.isAfter(booking.getEndDate())) {
-                    booking.setStatus(BookingStatus.COMPLETED);
-                } else  booking.setStatus(BookingStatus.BOOKED);
-            }
-        }
+        bookings.forEach(
+                booking -> {
+                    LocalDate today = LocalDate.now();
+                    if (booking.getStatus() != BookingStatus.CANCELED && booking.getStatus() != BookingStatus.COMPLETED) {
+                        if ((booking.getStartDate().isEqual(today) || booking.getEndDate().isEqual(today)) ||
+                                (booking.getStartDate().isBefore(today) && booking.getEndDate().isAfter(today))) {
+                            booking.setStatus(BookingStatus.ACTIVE);
+                        } else if (today.isAfter(booking.getEndDate())) {
+                            booking.setStatus(BookingStatus.COMPLETED);
+                        } else booking.setStatus(BookingStatus.BOOKED);
+                    }
+                }
+        );
+        FileManager.writeToFile(bookings, filePath);
     }
 
     /*
