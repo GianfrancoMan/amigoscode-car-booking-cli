@@ -410,7 +410,10 @@ public class Main {
             System.out.println("-----------------------------------------------------------");
             return;
         }
-        for (String booking : bookingsData) System.out.println("\n(" + (bookingsData.indexOf(booking) + 1) + ")\t" + booking);
+        int index = 1;
+        for(String bookingData : bookingsData) {
+            System.out.println("\n(" + index + ")\t" + bookingData);
+        }
         System.out.println("-----------------------------------------------------------");
     }
 

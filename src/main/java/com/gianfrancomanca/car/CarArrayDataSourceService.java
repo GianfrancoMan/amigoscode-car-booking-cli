@@ -23,7 +23,6 @@ public class CarArrayDataSourceService implements CarDao {
 
     //retrieve a car by id
     public Optional<Car> getCarById(String id) {
-        Car resultingCar = cars.stream().filter(car -> car.getId().toString().equals(id)).findFirst().orElse(null);
-        return null == resultingCar ? Optional.empty() : Optional.of(resultingCar);
+        return cars.stream().filter(car -> car.getId().toString().equals(id)).findFirst();
     }
 }
