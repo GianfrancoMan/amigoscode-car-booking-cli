@@ -1,12 +1,11 @@
 package com.gianfrancomanca.car;
 
 import net.datafaker.Faker;
+import net.datafaker.service.FakerContext;
+import net.datafaker.service.RandomService;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CarFakerDataAccessService implements CarDao{
@@ -26,34 +25,20 @@ public class CarFakerDataAccessService implements CarDao{
 
     private List<Car> generateCars() {
         Faker faker =new Faker();
-        List<String> makeAndModels = new ArrayList<>();
-        for (int i = 0; i < 157; i++) makeAndModels.add(faker.vehicle().makeAndModel());
-        var fakeCars = makeAndModels.stream().map( map -> {
-            String make = map.substring(0, map.indexOf(" "));
-            String model = map.substring(map.indexOf(" ")+ 1);
-            return new FakeCar(make, model);
-        });
+        var models = new ArrayList<String>();
+        for (int i = 0; i < 10; i++)
+           models.add(faker.vehicle().model()) ;
 
-        return fakeCars.filter( fcar ->
-            fcar.make().equalsIgnoreCase(Brand.AUDI.getName())
-                    || fcar.make().equalsIgnoreCase(Brand.FORD.getName())
-                    || fcar.make().equalsIgnoreCase(Brand.RENAULT.getName()))
-                .limit(10)
-                .map(fc -> new Car
-                        (UUID.randomUUID(),
-                                brandExtraction(fc.make()),fc.model,
-                                faker.vehicle().licensePlate(),
-                                new BigDecimal(faker.commerce().price()),
-                                faker.bool().bool()))
-                .distinct()
+        return models.stream()
+                .map(model ->
+                    new Car(
+                            UUID.randomUUID(),
+                            Brand.values()[new Random().nextInt(Brand.values().length)],
+                            model,
+                            faker.vehicle().licensePlate(),
+                            new BigDecimal(faker.commerce().price()),
+                            !faker.bool().bool()))
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    private Brand brandExtraction(String brand) {
-        if(Brand.AUDI .getName().equalsIgnoreCase(brand)) return Brand.AUDI;
-        else if(Brand.FORD.getName().equalsIgnoreCase(brand)) return Brand.FORD;
-        else return Brand.RENAULT;
-    }
-
-    record FakeCar(String make, String model){}
 }
