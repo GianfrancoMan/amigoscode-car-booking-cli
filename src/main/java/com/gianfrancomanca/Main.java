@@ -5,9 +5,11 @@ import com.gianfrancomanca.booking.CarBooking;
 import com.gianfrancomanca.booking.CarBookingFileDataAccessService;
 import com.gianfrancomanca.booking.CarBookingService;
 import com.gianfrancomanca.car.Car;
+import com.gianfrancomanca.car.CarFakerDataAccessService;
 import com.gianfrancomanca.car.CarFileDataSourceService;
 import com.gianfrancomanca.car.CarService;
 import com.gianfrancomanca.user.User;
+import com.gianfrancomanca.user.UserFakerDataAccessService;
 import com.gianfrancomanca.user.UserFileDataSourceService;
 import com.gianfrancomanca.user.UserService;
 
@@ -40,8 +42,10 @@ public class Main {
         Main mainReference = new Main(
                 new Scanner(System.in),
                 new CarBookingService(new CarBookingFileDataAccessService("src/main/resources/carbooking-file-data-source.cs")),
-                new UserService(new UserFileDataSourceService("src/main/resources/user-file-data-source.cs")),
-                new CarService(new CarFileDataSourceService("src/main/resources/car-file-data-source.cs")));
+//                new UserService(new UserFileDataSourceService("src/main/resources/user-file-data-source.cs")),
+                new UserService(new UserFakerDataAccessService(20)),
+//                new CarService(new CarFileDataSourceService("src/main/resources/car-file-data-source.cs"))
+                new CarService(new CarFakerDataAccessService()));
         mainReference.userInterface();
     }
 
